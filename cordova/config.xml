@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="kanjidamage" version="0.1.0">
+  <name>Kanjidamage</name>
+  <description>
+    KanjiDamage App
+  </description>
+  <author email="masume5590@googlemail.com">
+    David Buschtöns
+  </author>
+</widget>

@@ -1,0 +1,13 @@
+{
+  "name": "kanjidamage",
+  "version": "0.1.0",
+  "main": "dist/app.js",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "tabris serve"
+  },
+  "devDependencies": {
+    "typescript": "^2.1.6"
+  }
+}

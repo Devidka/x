@@ -11,8 +11,8 @@ export default class KanjiPage extends Page {
     super();
     this.data = data;
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
-    scrollView.on('swipe:left', () => openPage(data.id ));
-    scrollView.on('swipe:right', () => openPage(data.id - 2));
+    scrollView.on('swipe:left', () => openPage(data.id + 1 ));
+    scrollView.on('swipe:right', () => openPage(data.id - 1));
     let dataString = '';
     for (let key of Object.keys(this.data)) {
       dataString += key + ': ' + this.data[key] + '<br/>';

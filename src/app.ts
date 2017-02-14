@@ -3,7 +3,7 @@ import { IDictionaryEntry } from './interfaces';
 import KanjiPage from './Kanjipage'
 
 var navigationView = new NavigationView({
-  left: 0, top: 0, right: 0, bottom: 0
+  left: 0, top: 0, right: 0, bottom: 0, animated: false
 }).appendTo(ui.contentView);
 
 var page = new Page({
@@ -56,3 +56,7 @@ function searchKanji(value) {
     }
     }).catch(err => console.log(err));
 } 
+export function openPage(pageNum) {
+  new KanjiPage(dictionary[pageNum])
+            .appendTo(navigationView);
+}

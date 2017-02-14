@@ -1,5 +1,6 @@
 import { Page, TextView, ScrollView } from 'tabris';
 import { IDictionaryEntry } from './interfaces';
+import { openPage } from './app';
 
 export default class KanjiPage extends Page {
   
@@ -9,6 +10,8 @@ export default class KanjiPage extends Page {
     super();
     this.data = data;
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
+    scrollView.on('swipe:left', () => openPage(data.id ));
+    scrollView.on('swipe:right', () => openPage(data.id -2 ));
     scrollView.append(
       new TextView({ class: 'kanji' }),
       new TextView({ class: 'usefulness' }),      

@@ -1,7 +1,11 @@
-import { NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui } from 'tabris';
+import { Action, NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui, WebView } from 'tabris';
 import { IDictionaryEntry } from './interfaces';
 import KanjiPage from './Kanjipage';
 import EntryCollection from './EntryCollection';
+
+export var config = {
+  onMode: "romaji"
+}
 
 var navigationView = new NavigationView({
   left: 0, top: 0, right: 0, bottom: 0, animated: false
@@ -11,13 +15,20 @@ var page = new Page({
   title: 'Search action'
 }).appendTo(navigationView);
 
-// var searchBox = new Composite({
-//   centerX: 0, centerY: 0
-// }).appendTo(page);
+new Action({
+  placementPriority: "low",
+  title: "toggleKana"
+}).on('select', () => {
+  if (config.onMode == "romaji") {
+    config.onMode = "hiragana";
+  } else if (config.onMode == "hiragana") {
+    config.onMode = "katakana";
+  } else if (config.onMode == "katakana") {
+    config.onMode = "romaji";
+  }
+});
 
-// var textView = new TextView().appendTo(searchBox);
-
-var action = new SearchAction({
+new SearchAction({
   title: 'Search',
   image: {
     src: device.platform === 'iOS' ? '../images/search-black-24dp@3x.png' : '../images/search-white-24dp@3x.png',
@@ -44,28 +55,38 @@ fetch('../KanjiDamage.json')
   .then(response => response.json())
   .then(json => dictionary = json)
   .then(() => {
-    page.append(
-      new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
-    );
+    new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
+      .on('select', (collectionTarget: EntryCollection, entry, { index }) => {
+        
+        new KanjiPage(entry).on('navigate', ({ target, offset }) => {
+          target.dispose();
+          //TODO: open page for the next entry cleanly
+          //collectionTarget
+
+        }).appendTo(navigationView);
+    }).appendTo(page);
   });
+
+
+
+
 function searchKanji(value) {
-    fetch('../KanjiDamage.json')
-      .then(response => response.json())
-      .then(json => dictionary = json)
-      .then(() => {
-        let result = dictionary.filter(entry => entry.kanji === value)[0];
-        if (result) {
-          //textView.text = result.kanji;
-        } else {
-          if (parseInt(value)) {
-            //textView.text = dictionary[parseInt(value)].kanji;
-            new KanjiPage(dictionary[parseInt(value)])
-              .appendTo(navigationView);
-          }
+  fetch('../KanjiDamage.json')
+    .then(response => response.json())
+    .then(json => dictionary = json)
+    .then(() => {
+      let result = dictionary.filter(entry => entry.kanji === value)[0];
+      if (result) {
+        //textView.text = result.kanji;
+      } else {
+        if (parseInt(value)) {
+          //textView.text = dictionary[parseInt(value)].kanji;
+          new KanjiPage(dictionary[parseInt(value)])
+            .appendTo(navigationView);
         }
-      }).catch(err => console.log(err));
-  } 
+      }
+    }).catch(err => console.log(err));
+}
 export function openPage(pageNum) {
-  new KanjiPage(dictionary[pageNum-1])
-    .appendTo(navigationView);
+  new KanjiPage(dictionary[pageNum - 1]).appendTo(navigationView);
 }

@@ -20,6 +20,10 @@ export interface IJukugo {
         tags: string[];
 }
 
+export interface ILookalikeSet {
+        lookalikeTable: { kanji: string, meaning: string, hint: string, radical: string }[],
+        lookalikeMnemonics: string[]
+}
 
 export interface IDictionaryEntry {
   number: number;
@@ -35,4 +39,7 @@ export interface IDictionaryEntry {
   mnemonic: string;
   kunyomi: IKunyomi[];
   jukugo: IJukugo[];
+  frequencyRating: number;
+  usedIn: { kanji: string, kanjiImageSource: string }[];
+  lookalikeSets: ILookalikeSet[];
 }

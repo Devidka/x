@@ -7,6 +7,9 @@ export var config = {
   onMode: "romaji"
 }
 
+console.log('asdfasdf'.substr(3, 4));
+
+
 var navigationView = new NavigationView({
   left: 0, top: 0, right: 0, bottom: 0, animated: false
 }).appendTo(ui.contentView);
@@ -26,7 +29,8 @@ new Action({
   } else if (config.onMode == "katakana") {
     config.onMode = "romaji";
   }
-});
+  console.error("onyomi now displayed as " + config.onMode);
+}).appendTo(navigationView);
 
 new SearchAction({
   title: 'Search',
@@ -37,7 +41,7 @@ new SearchAction({
 }).on('select', function () {
   this.text = '';
 }).on('accept', function (widget, query) {
-  searchKanji(query);
+  //searchKanji(query);
 }).appendTo(navigationView);
 
 
@@ -51,42 +55,41 @@ new SearchAction({
 
 let dictionary: IDictionaryEntry[] = [];
 
+
+// TODO: kill that pyramid
 fetch('../KanjiDamage.json')
-  .then(response => response.json())
-  .then(json => dictionary = json)
-  .then(() => {
-    new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
-      .on('select', (collectionTarget: EntryCollection, entry, { index }) => {
-        
-        new KanjiPage(entry).on('navigate', ({ target, offset }) => {
-          target.dispose();
-          //TODO: open page for the next entry cleanly
-          //collectionTarget
-
-        }).appendTo(navigationView);
-    }).appendTo(page);
-  });
-
-
-
-
-function searchKanji(value) {
-  fetch('../KanjiDamage.json')
-    .then(response => response.json())
-    .then(json => dictionary = json)
+  .then(response => response.json().then(json => dictionary = json)
     .then(() => {
-      let result = dictionary.filter(entry => entry.kanji === value)[0];
-      if (result) {
-        //textView.text = result.kanji;
-      } else {
-        if (parseInt(value)) {
-          //textView.text = dictionary[parseInt(value)].kanji;
-          new KanjiPage(dictionary[parseInt(value)])
-            .appendTo(navigationView);
-        }
-      }
-    }).catch(err => console.log(err));
-}
-export function openPage(pageNum) {
-  new KanjiPage(dictionary[pageNum - 1]).appendTo(navigationView);
-}
+      new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
+        .on('select', (collectionTarget: EntryCollection, entry, { index }) => {
+          new KanjiPage(entry).on('navigate', ({ target, offset }) => {
+            target.dispose();
+            //TODO: open page for the next entry cleanly
+            //collectionTarget
+          }).appendTo(navigationView);
+        }).appendTo(page);
+    })
+  );
+
+
+
+// function searchKanji(value) {
+//   fetch('../KanjiDamage.json')
+//     .then(response => response.json())
+//     .then(json => dictionary = json)
+//     .then(() => {
+//       let result = dictionary.filter(entry => entry.kanji === value)[0];
+//       if (result) {
+//         //textView.text = result.kanji;
+//       } else {
+//         if (parseInt(value)) {
+//           //textView.text = dictionary[parseInt(value)].kanji;
+//           new KanjiPage(dictionary[parseInt(value)])
+//             .appendTo(navigationView);
+//         }
+//       }
+//     }).catch(err => console.log(err));
+// }
+// export function openPage(pageNum) {
+//   new KanjiPage(dictionary[pageNum - 1]).appendTo(navigationView);
+// }

@@ -31,7 +31,7 @@ export interface IDictionaryEntry {
   tags: string[];
   strokeOrderImageSource: string;
   components: {kanji: string, kanjiImageSource: string, meaning: string}[];
-  onyomi: string;
+  onyomi: string[];
   mnemonic: string;
   kunyomi: IKunyomi[];
   jukugo: IJukugo[];

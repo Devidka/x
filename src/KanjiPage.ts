@@ -1,6 +1,6 @@
 import { Page, TextView, ScrollView, ImageView } from 'tabris';
 import { IDictionaryEntry } from './interfaces';
-import { parseImage, getUsefulnessStars, createKanji } from './util';
+import { parseImage, getUsefulnessStars, createKanji, getOnyomi } from './util';
 import { applyColors } from './resources';
 
 const MAIN_KANJI_SIZE = 80;
@@ -18,7 +18,7 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'translation', text: data.meaning, font: '30px' }),
       new TextView({ class: 'number', text: '' + data.number, font: '16px' }),
       new TextView({ class: 'label', id: 'onLabel', text: 'On: ', font: '24px' }),
-      new TextView({ class: 'onyomi', text: data.onyomi, font: '24px' }),
+      new TextView({ class: 'onyomi', text: getOnyomi(data), font: '24px' }),
       //new TextView({ class: 'description'})
     )
     applyColors(this);

@@ -5,6 +5,12 @@ import KanjiPage from './Kanjipage';
 
 export default class EntryCollection extends CollectionView {
 
+  private data: IDictionaryEntry[];
+
+  get length(): number {
+    return this.data.length;
+  }
+  
   constructor(data: IDictionaryEntry[], properties) {
     properties.items = data;
     properties.itemHeight = 60;
@@ -26,8 +32,13 @@ export default class EntryCollection extends CollectionView {
         kanjiText.text = entry.kanji;
         meaningText.text = entry.meaning;
       });
-    };    
+    };
     super(properties);
+    this.data = data;
+  }
+
+  public getEntry(index: number): IDictionaryEntry {
+    return this.data[index];
   }
 
 }

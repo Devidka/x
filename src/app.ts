@@ -2,13 +2,11 @@ import { Action, NavigationView, Page, Composite, TextView, SearchAction, device
 import { IDictionaryEntry } from './interfaces';
 import KanjiPage from './Kanjipage';
 import EntryCollection from './EntryCollection';
+import { toHiragana, toKatakana, toRomaji, isHiragana } from './wanakana'
 
 export var config = {
   onMode: "romaji"
 }
-
-console.log('asdfasdf'.substr(3, 4));
-
 
 var navigationView = new NavigationView({
   left: 0, top: 0, right: 0, bottom: 0, animated: false
@@ -17,7 +15,6 @@ var navigationView = new NavigationView({
 var page = new Page({
   title: 'Search action'
 }).appendTo(navigationView);
-
 new Action({
   placementPriority: "low",
   title: "toggleKana"
@@ -29,6 +26,9 @@ new Action({
   } else if (config.onMode == "katakana") {
     config.onMode = "romaji";
   }
+  ui.contentView.find('.onyomi').forEach((widget: TextView) => {
+    widget.text = config.onMode == "hiragana" ? toHiragana(widget.text) : config.onMode == "katakana" ? toKatakana(widget.text) : toRomaji(widget.text).toUpperCase();
+  })
   console.error("onyomi now displayed as " + config.onMode);
 }).appendTo(navigationView);
 
@@ -61,12 +61,17 @@ fetch('../KanjiDamage.json')
   .then(response => response.json().then(json => dictionary = json)
     .then(() => {
       new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
-        .on('select', (collectionTarget: EntryCollection, entry, { index }) => {
-          new KanjiPage(entry).on('navigate', ({ target, offset }) => {
-            target.dispose();
-            //TODO: open page for the next entry cleanly
-            //collectionTarget
-          }).appendTo(navigationView);
+        .on('select', (collection: EntryCollection, entry, { index }) => {
+          let entryNum = 0;
+          let openNextPage = (event?: { target: Page, offset: number }) => {
+            if (event) {
+              event.target.dispose();
+              entryNum = (entryNum + event.offset) % collection.length;
+              entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
+            }
+            new KanjiPage(collection.getEntry(entryNum)).on('navigate', openNextPage).appendTo(navigationView);
+          };
+          openNextPage();
         }).appendTo(page);
     })
   );

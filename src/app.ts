@@ -69,7 +69,7 @@ fetch('../KanjiDamage.json')
               entryNum = (entryNum + event.offset) % collection.length;
               entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
             }
-            new KanjiPage(collection.getEntry(entryNum)).on('navigate', openNextPage).appendTo(navigationView);
+            new KanjiPage(collection.getEntry(entryNum), (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
           };
           openNextPage();
         }).appendTo(page);

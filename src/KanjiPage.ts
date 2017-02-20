@@ -7,8 +7,9 @@ const MAIN_KANJI_SIZE = 80;
 
 export default class KanjiPage extends Page {
 
-  constructor(data: IDictionaryEntry) {
+  constructor(data: IDictionaryEntry, title?: string) {
     super();
+    this.title = title + '  ' + data.kanji;
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
@@ -67,7 +68,7 @@ export default class KanjiPage extends Page {
       '.translation': { left: ['.kanji', 16], top: 35 },
       '#onLabel': { left: ['.kanji', 16], top: ['.translation', 0] },
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel' },
-      '.mnemonic': { top: ['.kanji', 5], left: 20, right: 20}
+      '.mnemonic': { top: ['.kanji', 5], left: 20, right: 20 }
     });
   }
 

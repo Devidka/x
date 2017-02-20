@@ -62,7 +62,7 @@ fetch('../KanjiDamage.json')
     .then(() => {
       new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
         .on('select', (collection: EntryCollection, entry, { index }) => {
-          let entryNum = 0;
+          let entryNum = index;
           let openNextPage = (event?: { target: Page, offset: number }) => {
             if (event) {
               event.target.dispose();

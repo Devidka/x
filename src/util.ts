@@ -22,6 +22,7 @@ export function createKanji(data: { kanji: string, kanjiImageSource?: string }, 
 export function getOnyomi(data: { onyomi: string[] }) {
   let result = [];
   for (let yomi of data.onyomi) {
+    console.log(yomi);
     switch (config.onMode) {
       case "hiragana":
         result.push(toHiragana(yomi));
@@ -32,6 +33,6 @@ export function getOnyomi(data: { onyomi: string[] }) {
       default:
         result.push(yomi);
     }
-    return result.join(", ");
   }
+  return result.join(", ");
 }

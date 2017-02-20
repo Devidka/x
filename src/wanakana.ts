@@ -123,7 +123,7 @@ wanakana._isCharKatakana = function (char) {
   return wanakana._isCharInRange(char, wanakana.KATAKANA_START, wanakana.KATAKANA_END);
 };
 
-wanakana._isCharHiragana = function (char) {
+wanakana._isCharHiragana = function (char) {  
   return wanakana._isCharInRange(char, wanakana.HIRAGANA_START, wanakana.HIRAGANA_END);
 };
 
@@ -252,7 +252,6 @@ wanakana._romajiToKana = function (roma, options, ignoreCase) {
   cursor = 0;
   maxChunk = 3;
   getChunk = function () {
-    console.log(roma);
     return roma.substr(cursor, chunkSize);
   };
   isCharUpperCase = function (char) {
@@ -385,15 +384,12 @@ export function toHiragana(input: string, options?) {
   return input;
 };
 
-export function toKatakana(input: string, options?) {
-  if (isHiragana(input)) {
-    return input = wanakana._hiraganaToKatakana(input, options);
-  }
+export function toKatakana(input: string, options?) {  
   if (isRomaji(input)) {
     input = wanakana._romajiToHiragana(input, options);
     return input = wanakana._hiraganaToKatakana(input, options);
   }
-  return input;
+  return input = wanakana._hiraganaToKatakana(input, options);
 };
 
 export function toKana(input: string, options?) {

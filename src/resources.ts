@@ -17,8 +17,8 @@ export function applyColors(composite: Composite) {
     '.onyomi': { textColor: colors.onyomi },
     '.translation': { textColor: colors.translation },
     '.particle': { textColor: colors.particle, tintColor: colors.particle },
-    '.component': { textColor: colors.component, tintColor: colors.component },
+    '.componentKanji': { textColor: colors.component, tintColor: colors.component },
     '.usedIn': { textColor: colors.link, tintColor: colors.link },
     '.lookalike': { textColor: colors.link, tintColor: colors.link }
-  })
+  });
 }

@@ -24,15 +24,15 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'onyomi', text: getOnyomi(data), font: '24px' }),
       new TextView({ class: 'mnemonic', text: data.mnemonic, font: "20px", markupEnabled: true })
     )
-    for (let kunyomi of data.kunyomi) {
+    data.kunyomi.forEach(kunyomi => {
       this.createKunyomiDisplay(kunyomi).appendTo(scrollView);
-    }
-    for (let jukugo of data.jukugo) {
+    });
+    data.jukugo.forEach(jukugo => {
       this.createJukugoDisplay(jukugo).appendTo(scrollView);
-    }
-    for (let set of data.lookalikeSets) {
+    });
+    data.lookalikeSets.forEach(set => {
       this.createLookalikeDisplay(set);
-    }
+    });
     this.createUsedInDisplay(data.usedIn);
 
     applyColors(this);
@@ -40,7 +40,15 @@ export default class KanjiPage extends Page {
   }
 
   createComponentsDisplay(components: { kanji: string, kanjiImageSource: string, meaning: string }[]) {
-    return new Composite();
+    let composite = new Composite({ class: 'components'});
+    let prev: any = 0;
+    components.forEach(component => {
+      prev = new TextView({ top: 0, left: prev, class: 'componentKanji', text: component.kanji + ' '}).appendTo(composite);
+      let meaning = '(' + component.meaning + ')';
+      meaning += components.indexOf(component) == components.length - 1 ? '' : ' + '
+      prev = new TextView({ top: 0, left: prev, class: 'componentMeaning', text: meaning}).appendTo(composite);
+    });
+    return composite;
   }
 
   createKunyomiDisplay(kunyomi: IKunyomi) {
@@ -65,10 +73,11 @@ export default class KanjiPage extends Page {
       '.usefulness': { right: 10, top: 10 },
       '.strokeCount': { right: 10, top: ['.usefulness', 2] },
       '.kanji': { left: 20, top: 20 },
+      '.components' : { left: 20, top: ['.kanji', 0]},
       '.translation': { left: ['.kanji', 16], top: 35 },
       '#onLabel': { left: ['.kanji', 16], top: ['.translation', 0] },
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel' },
-      '.mnemonic': { top: ['.kanji', 5], left: 20, right: 20 }
+      '.mnemonic': { top: ['.components', 5], left: 20, right: 20 }
     });
   }
 

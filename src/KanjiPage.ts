@@ -1,6 +1,6 @@
 import { Page, TextView, ScrollView, ImageView, Composite, Widget } from 'tabris';
 import { IDictionaryEntry, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
-import { parseImage, getUsefulnessStars, createKanji, getOnyomi } from './util';
+import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag } from './util';
 import { applyColors } from './resources';
 
 const MAIN_KANJI_SIZE = 80;
@@ -25,6 +25,10 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'onyomi', text: getOnyomi(data), font: '24px' }),
       new TextView({ class: 'mnemonic', text: data.mnemonic, font: "18px", markupEnabled: true })
     )
+    let prev = scrollView.find('.strokeCount')[0];
+    data.tags.forEach(tag => {
+      prev = createTag(tag).set({ top: [prev, 2], right: 10 }).appendTo(scrollView);
+    })
     if (data.kunyomi && data.kunyomi.length > 0) {
       new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ', font: '26px' }).appendTo(scrollView),
         data.kunyomi.forEach(kunyomi => {
@@ -93,13 +97,13 @@ export default class KanjiPage extends Page {
   applyLayout() {
     this.apply({
       '.number': { centerX: 0, top: 5 },
-      '#usefulness': { right: 10, top: 10 },
-      '.strokeCount': { right: 10, top: ['.usefulness', 2] },
+      '#usefulness': { left: 10, top: 8 },
+      '.strokeCount': { right: 10, top: 10 },
       '.kanji': { left: 20, top: 20 },
-      '.components': { left: 20, top: ['.kanji', 0] },
-      '.translation': { left: ['.kanji', 16], top: 35 },
-      '#onLabel': { left: ['.kanji', 16], top: ['.translation', 0] },
-      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel' },
+      '.components': { left: 20, top: ['#onLabel', 5] },
+      '.translation': { left: ['.kanji', 10], top: 38, right: 100 },
+      '#onLabel': { left: ['.kanji', 10], top: ['.translation', 0] },
+      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100},
       '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
       '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
       '.kunyomi': { top: ['prev()', 0], left: 20, right: 20 }

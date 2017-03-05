@@ -1,6 +1,7 @@
-import { TextView, ImageView } from 'tabris';
+import { TextView, ImageView, Composite } from 'tabris';
 import { toHiragana, toKatakana } from './wanakana';
-import { config } from './app'
+import { config } from './app';
+import { colors } from './resources';
 
 export function parseImage(tag) {
   return '../images/dictionary/' + tag.split('"')[1];
@@ -34,4 +35,19 @@ export function getOnyomi(data: { onyomi: string[] }) {
     }
   }
   return result.join(", ");
+}
+
+export function createTag(tag: string) {
+  const INNER_MARGIN = 3;
+  return new Composite({class: 'tag', cornerRadius: 3, background: colors.tag }).append(
+    new TextView({
+      left: INNER_MARGIN,
+      right: INNER_MARGIN,
+      text: tag,
+      textColor: 'white',
+      font: 'bold 16px'
+      })
+  );
+
+
 }

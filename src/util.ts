@@ -37,17 +37,15 @@ export function getOnyomi(data: { onyomi: string[] }) {
   return result.join(", ");
 }
 
-export function createTag(tag: string) {
+export function createTag(tag: string, size = 16) {
   const INNER_MARGIN = 3;
-  return new Composite({class: 'tag', cornerRadius: 3, background: colors.tag }).append(
+  return new Composite({ class: 'tag', cornerRadius: 3, background: colors.tag }).append(
     new TextView({
       left: INNER_MARGIN,
       right: INNER_MARGIN,
       text: tag,
       textColor: 'white',
-      font: 'bold 16px'
-      })
+      font: 'bold ' + size + 'px'
+    })
   );
-
-
 }

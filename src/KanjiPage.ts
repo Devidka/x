@@ -5,6 +5,7 @@ import { applyColors } from './resources';
 
 const MAIN_KANJI_SIZE = 80;
 const TEMP_KUN_KANJI_SETTING = true;
+const COLUMN_WIDTH = 110;
 
 export default class KanjiPage extends Page {
 
@@ -14,6 +15,10 @@ export default class KanjiPage extends Page {
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
+    let prev = scrollView.find('.strokeCount')[0];
+    data.tags.forEach(tag => {
+      prev = createTag(tag).set({ top: [prev, 2], right: 10 }).appendTo(scrollView);
+    })
     scrollView.append(
       createKanji(data, MAIN_KANJI_SIZE),
       this.createComponentsDisplay(data.components),
@@ -25,19 +30,20 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'onyomi', text: getOnyomi(data), font: '24px' }),
       new TextView({ class: 'mnemonic', text: data.mnemonic, font: "18px", markupEnabled: true })
     )
-    let prev = scrollView.find('.strokeCount')[0];
-    data.tags.forEach(tag => {
-      prev = createTag(tag).set({ top: [prev, 2], right: 10 }).appendTo(scrollView);
-    })
     if (data.kunyomi && data.kunyomi.length > 0) {
       new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ', font: '26px' }).appendTo(scrollView),
         data.kunyomi.forEach(kunyomi => {
           this.createKunyomiDisplay(kunyomi).appendTo(scrollView);
+          new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
         });
     }
-    data.jukugo.forEach(jukugo => {
-      this.createJukugoDisplay(jukugo).appendTo(scrollView);
-    });
+    if (data.jukugo && data.jukugo.length > 0) {
+      new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ', font: '26px' }).appendTo(scrollView),
+        data.jukugo.forEach(jukugo => {
+          this.createJukugoDisplay(jukugo).appendTo(scrollView);
+          new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
+        });
+    }
     data.lookalikeSets.forEach(set => {
       this.createLookalikeDisplay(set);
     });
@@ -83,7 +89,26 @@ export default class KanjiPage extends Page {
   }
 
   createJukugoDisplay(jukugo: IJukugo) {
-    return new Composite();
+    let composite = new Composite({ class: 'jukugo' });
+    let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(composite);
+    let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
+    let stars = new TextView({ class: 'usefulness', top: 0, right: 0, text: getUsefulnessStars(jukugo) }).appendTo(leftSide);
+    let kanjiBox = new Composite({ right: 0, top: 15 }).appendTo(leftSide);
+    new TextView({ class: 'juk reading', top: 2, centerX: 0, text: jukugo.reading, font: "10px" }).appendTo(kanjiBox);
+    new TextView({ top: 10, centerX: 0, text: jukugo.kanji, font: "20px" }).appendTo(kanjiBox);
+    //new TextView({ class: 'juk kanji', top: 100, text: jukugo.kanji, font: "20px" }).appendTo(leftSide);
+    // if (jukugo.postParticle != null) {
+    //   prev = new TextView({ class: 'post particle', top: reading, right: 0, text: jukugo.postParticle }).appendTo(leftSide);
+    // }
+    // if (jukugo.postParticle != null) {
+    //   new TextView({ class: 'pre particle', top: reading, right: prev, text: jukugo.preParticle }).appendTo(leftSide);
+    // }
+    let prev = 0;
+    jukugo.tags.forEach(tag => {
+      prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
+    })
+    new TextView({ class: 'jukugoMeaning', top: 25, font: "20px", text: jukugo.translation }).appendTo(rightSide);
+    return composite;
   }
 
   createLookalikeDisplay(set: ILookalikeSet) {
@@ -103,10 +128,13 @@ export default class KanjiPage extends Page {
       '.components': { left: 20, top: ['#onLabel', 5] },
       '.translation': { left: ['.kanji', 10], top: 38, right: 100 },
       '#onLabel': { left: ['.kanji', 10], top: ['.translation', 0] },
-      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100},
+      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100 },
       '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
       '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
-      '.kunyomi': { top: ['prev()', 0], left: 20, right: 20 }
+      '.kunyomi': { top: ['prev()', 0], left: 20, right: 20 },
+      '#jukugoLabel': { left: 10, top: ['prev()', 5] },
+      '.jukugo': { top: ['prev()', 0], left: 0, right: 20 },
+      '.seperator': { top: ['prev()', 3], left: 20, right: 20 }
     });
   }
 

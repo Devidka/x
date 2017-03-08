@@ -101,21 +101,20 @@ export default class KanjiPage extends Page {
     let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(composite);
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
     let stars = new TextView({ class: 'usefulness', top: 0, right: 0, text: getUsefulnessStars(jukugo) }).appendTo(leftSide);
-    let kanjiBox = new Composite({ right: 0, top: 15 }).appendTo(leftSide);
-    new TextView({ class: 'juk reading', top: 2, centerX: 0, text: jukugo.reading, font: "10px" }).appendTo(kanjiBox);
-    new TextView({ top: 10, centerX: 0, text: jukugo.kanji, font: "20px" }).appendTo(kanjiBox);
-    //new TextView({ class: 'juk kanji', top: 100, text: jukugo.kanji, font: "20px" }).appendTo(leftSide);
-    // if (jukugo.postParticle != null) {
-    //   prev = new TextView({ class: 'post particle', top: reading, right: 0, text: jukugo.postParticle }).appendTo(leftSide);
-    // }
-    // if (jukugo.postParticle != null) {
-    //   new TextView({ class: 'pre particle', top: reading, right: prev, text: jukugo.preParticle }).appendTo(leftSide);
-    // }
     let prev: any = 0;
+    if (jukugo.postParticle != null) {
+      prev = new TextView({ class: 'post particle', top: 29, right: prev,font: "16px", text: jukugo.postParticle }).appendTo(leftSide);
+    }
+    let kanjiBox = new Composite({ right: prev, top: 15 }).appendTo(leftSide);
+    new TextView({ class: 'furigana', top: 2, centerX: 0, text: jukugo.reading, font: "10px" }).appendTo(kanjiBox);
+    new TextView({ top: 10, centerX: 0, text: jukugo.kanji, font: "20px" }).appendTo(kanjiBox);
+    if (jukugo.preParticle != null) {
+      new TextView({ class: 'pre particle', top: 29, right: kanjiBox, font: "16px", text: jukugo.preParticle }).appendTo(leftSide);
+    }
+    prev = 0;
     jukugo.tags.forEach(tag => {
       prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
     })
-    prev = 0;
     this.createComponentsDisplay(jukugo.components, 2).set({ left: 0, top: 5, right:0 }).appendTo(rightSide);
     new TextView({ class: 'jukugoMeaning', top: 'prev()', font: "20px", text: jukugo.translation }).appendTo(rightSide);
     if (jukugo.description) {

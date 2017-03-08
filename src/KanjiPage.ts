@@ -53,14 +53,22 @@ export default class KanjiPage extends Page {
     this.applyLayout();
   }
 
-  createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[]) {
+  createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[], maxColumns?: number) {
     let composite = new Composite({ class: 'components' });
-    let prev: any = 0;
+    let prevLeft: any = 0;
+    let prevTop: any = 0;
+    let columns = 0;
     components.forEach(component => {
-      prev = new TextView({ top: 0, left: prev, class: 'componentKanji', text: component.kanji + ' ' }).appendTo(composite);
+      columns++;
+      prevLeft = new TextView({ top: prevTop, left: prevLeft, class: 'componentKanji', text: component.kanji + ' ' }).appendTo(composite);
       let meaning = '(' + component.meaning + ')';
       meaning += components.indexOf(component) == components.length - 1 ? '' : ' + '
-      prev = new TextView({ top: 0, left: prev, class: 'componentMeaning', text: meaning }).appendTo(composite);
+      prevLeft = new TextView({ top: prevTop, left: prevLeft, class: 'componentMeaning', text: meaning }).appendTo(composite);
+      if (columns >= maxColumns) {
+        columns = 0;
+        prevTop = prevLeft;
+        prevLeft = 0;
+      }
     });
     return composite;
   }
@@ -108,8 +116,11 @@ export default class KanjiPage extends Page {
       prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
     })
     prev = 0;
-    this.createComponentsDisplay(jukugo.components).set({left: 0, top: 10}).appendTo(rightSide);
-    new TextView({ class: 'jukugoMeaning', top: 25, font: "20px", text: jukugo.translation }).appendTo(rightSide);
+    this.createComponentsDisplay(jukugo.components, 2).set({ left: 0, top: 5, right:0 }).appendTo(rightSide);
+    new TextView({ class: 'jukugoMeaning', top: 'prev()', font: "20px", text: jukugo.translation }).appendTo(rightSide);
+    if (jukugo.description) {
+      new TextView({ class: 'jukugoDescription', top: 'prev()', font: "16px", text: jukugo.description }).appendTo(rightSide);
+    }
     return composite;
   }
 

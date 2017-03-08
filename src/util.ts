@@ -17,7 +17,7 @@ export function createKanji(data: { kanji: string, kanjiImageSource?: string }, 
   if (data.kanjiImageSource) {
     console.error('drawing image kanji is not yet supportet')
   }
-  return new TextView({ class: 'kanji', text: data.kanji, font: size + 'px' });
+  return new TextView({ class: 'mainKanji', text: data.kanji, font: size + 'px' });
 }
 
 export function getOnyomi(data: { onyomi: string[] }) {

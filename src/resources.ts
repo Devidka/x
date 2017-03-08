@@ -10,15 +10,52 @@ export let colors = {
   link: '#08c'
 }
 
+export let fonts = {
+  mainUsefulness: '20px',
+  usefulness: '14px',
+  meaning: '30px',
+  number: '16px',
+  strokeCount: '16px',
+  component: '14px',
+  mnemonic: '18px',
+  label: '26px',
+  onyomi: '26px',
+  bigText: '18px',
+  smallText: '16px',
+  particle: '16px',
+  furigana: '10px',
+  kanji: '20px'
+}
+
 export function applyColors(composite: Composite) {
   composite.apply({
     '.usefulness': { textColor: colors.usefulness },
     '.tagContainer': { background: colors.tag },
     '.onyomi': { textColor: colors.onyomi },
-    '.translation': { textColor: colors.translation },
+    '#meaning': { textColor: colors.translation },
     '.particle': { textColor: colors.particle, tintColor: colors.particle },
     '.componentKanji': { textColor: colors.component, tintColor: colors.component },
     '.usedIn': { textColor: colors.link, tintColor: colors.link },
     '.lookalike': { textColor: colors.link, tintColor: colors.link }
   });
+}
+
+export function applyFonts(composite: Composite) {
+  composite.apply({
+    '.usefulness': {font: fonts.usefulness},
+    '#usefulness': {font: fonts.mainUsefulness},
+    '#meaning': {font: fonts.meaning},
+    '.label': {font: fonts.label},
+    '.onyomi': {font: fonts.onyomi},
+    '.mnemonic': {font: fonts.bigText},
+    '.meaning': {font: fonts.bigText},
+    '.description': {font: fonts.smallText},
+    '.furigana': {font: fonts.furigana},
+    '.particle': {font: fonts.particle},
+    '.kana': {font: fonts.bigText},
+    '.kanji': {font: fonts.kanji},
+    '.component': {font: fonts.component},
+    '.componentKanji': {font: fonts.component}
+
+  })
 }

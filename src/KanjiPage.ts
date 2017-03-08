@@ -21,7 +21,7 @@ export default class KanjiPage extends Page {
     })
     scrollView.append(
       createKanji(data, MAIN_KANJI_SIZE),
-      this.createComponentsDisplay(data.components),
+      this.createComponentsDisplay(data.components).set("id", "components"),
       new TextView({ class: 'usefulness', id: 'usefulness', text: getUsefulnessStars(data), font: '20px' }),
       new TextView({ class: 'strokeCount', text: data.strokeCount + ' strokes', font: '15px' }),
       new TextView({ class: 'translation', text: data.meaning, font: '30px' }),
@@ -53,7 +53,7 @@ export default class KanjiPage extends Page {
     this.applyLayout();
   }
 
-  createComponentsDisplay(components: { kanji: string, kanjiImageSource: string, meaning: string }[]) {
+  createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[]) {
     let composite = new Composite({ class: 'components' });
     let prev: any = 0;
     components.forEach(component => {
@@ -103,10 +103,12 @@ export default class KanjiPage extends Page {
     // if (jukugo.postParticle != null) {
     //   new TextView({ class: 'pre particle', top: reading, right: prev, text: jukugo.preParticle }).appendTo(leftSide);
     // }
-    let prev = 0;
+    let prev: any = 0;
     jukugo.tags.forEach(tag => {
       prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
     })
+    prev = 0;
+    this.createComponentsDisplay(jukugo.components).set({left: 0, top: 10}).appendTo(rightSide);
     new TextView({ class: 'jukugoMeaning', top: 25, font: "20px", text: jukugo.translation }).appendTo(rightSide);
     return composite;
   }
@@ -125,7 +127,7 @@ export default class KanjiPage extends Page {
       '#usefulness': { left: 10, top: 8 },
       '.strokeCount': { right: 10, top: 10 },
       '.kanji': { left: 20, top: 20 },
-      '.components': { left: 20, top: ['#onLabel', 5] },
+      '#components': { left: 20, top: ['#onLabel', 5] },
       '.translation': { left: ['.kanji', 10], top: 38, right: 100 },
       '#onLabel': { left: ['.kanji', 10], top: ['.translation', 0] },
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100 },

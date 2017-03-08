@@ -31,7 +31,7 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'mnemonic', text: data.mnemonic, markupEnabled: true })
     )
     if (data.kunyomi && data.kunyomi.length > 0) {
-      new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: '}).appendTo(scrollView),
+      new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView),
         data.kunyomi.forEach(kunyomi => {
           this.createKunyomiDisplay(kunyomi).appendTo(scrollView);
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
@@ -61,10 +61,14 @@ export default class KanjiPage extends Page {
     let columns = 0;
     components.forEach(component => {
       columns++;
-      prevLeft = new TextView({ top: prevTop, left: prevLeft, class: 'componentKanji', text: component.kanji + ' ' }).appendTo(composite);
+      prevLeft = new TextView({ class: 'componentKanji', text: component.kanji + ' ' })
+        .set({ top: prevTop, left: prevLeft })
+        .appendTo(composite);
       let meaning = '(' + component.meaning + ')';
       meaning += components.indexOf(component) == components.length - 1 ? '' : ' + '
-      prevLeft = new TextView({ top: prevTop, left: prevLeft, class: 'componentMeaning', text: meaning }).appendTo(composite);
+      prevLeft = new TextView({ class: 'componentMeaning', text: meaning })
+        .set({ top: prevTop, left: prevLeft })
+        .appendTo(composite);
       if (columns >= maxColumns) {
         columns = 0;
         prevTop = prevLeft;
@@ -77,19 +81,37 @@ export default class KanjiPage extends Page {
   createKunyomiDisplay(kunyomi: IKunyomi) {
     let composite = new Composite({ class: 'kunyomi' });
     let offset = 5;
-    let stars = new TextView({ class: 'usefulness', left: 0, top: 0, text: getUsefulnessStars(kunyomi) }).appendTo(composite);
-    let prev = new TextView({ class: 'meaning', left: stars, top: [stars, 3], right: 0, text: kunyomi.translation }).appendTo(composite);
+    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi) })
+      .set({ left: 0, top: 0 })
+      .appendTo(composite);
+    let prev = new TextView({ class: 'meaning', left: stars, text: kunyomi.translation })
+      .set({ top: [stars, 3], right: 0 })
+      .appendTo(composite);
     if (kunyomi.postParticle != null) {
-      prev = new TextView({ class: 'particle', right: [prev, offset], top: stars, text: kunyomi.postParticle }).appendTo(composite);
+      prev = new TextView({ class: 'particle', text: kunyomi.postParticle })
+        .set({ right: [prev, offset], top: stars })
+        .appendTo(composite);
       offset = 0;
     }
     if (kunyomi.okurigana != null) {
-      prev = new TextView({ class: 'kana', right: [prev, offset], top: stars, text: kunyomi.okurigana }).appendTo(composite);
+      prev = new TextView({ class: 'kana', text: kunyomi.okurigana })
+        .set({ right: [prev, offset], top: stars })
+        .appendTo(composite);
       offset = 0;
-      if (TEMP_KUN_KANJI_SETTING) prev = new TextView({ class: 'kana', right: prev, top: stars, text: '*' }).appendTo(composite);
+      if (TEMP_KUN_KANJI_SETTING) {
+        prev = new TextView({ class: 'kana', text: '*' })
+          .set({ right: prev, top: stars })
+          .appendTo(composite);
+      }
     }
-    prev = new TextView({ class: 'kana', right: [prev, offset], top: stars, text: kunyomi.reading }).appendTo(composite);
-    if (kunyomi.preParticle != null) prev = new TextView({ class: 'particle', right: prev, top: stars, text: kunyomi.preParticle }).appendTo(composite);
+    prev = new TextView({ class: 'kana', text: kunyomi.reading })
+      .set({ right: [prev, offset], top: stars })
+      .appendTo(composite);
+    if (kunyomi.preParticle != null) {
+      prev = new TextView({ class: 'particle', text: kunyomi.preParticle })
+        .set({ right: prev, top: stars })
+        .appendTo(composite);
+    }
     return composite;
   }
 
@@ -97,25 +119,35 @@ export default class KanjiPage extends Page {
     let composite = new Composite({ class: 'jukugo' });
     let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(composite);
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
-    let stars = new TextView({ class: 'usefulness', top: 0, right: 0, text: getUsefulnessStars(jukugo) }).appendTo(leftSide);
+    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(jukugo) })
+      .set({ top: 0, right: 0 })
+      .appendTo(leftSide);
     let prev: any = 0;
     if (jukugo.postParticle != null) {
-      prev = new TextView({ class: 'post particle', top: 29, right: prev, text: jukugo.postParticle }).appendTo(leftSide);
+      prev = new TextView({ class: 'post particle', text: jukugo.postParticle })
+        .set({ top: 29, right: prev })
+        .appendTo(leftSide);
     }
     let kanjiBox = new Composite({ right: prev, top: 15 }).appendTo(leftSide);
-    new TextView({ class: 'furigana', top: 2, centerX: 0, text: jukugo.reading }).appendTo(kanjiBox);
-    new TextView({ class: 'kanji', top: 10, centerX: 0, text: jukugo.kanji }).appendTo(kanjiBox);
+    new TextView({ class: 'furigana', text: jukugo.reading })
+      .set({ top: 2, centerX: 0 })
+      .appendTo(kanjiBox);
+    new TextView({ class: 'kanji', text: jukugo.kanji })
+      .set({ top: 10, centerX: 0 })
+      .appendTo(kanjiBox);
     if (jukugo.preParticle != null) {
-      new TextView({ class: 'particle', top: 29, right: kanjiBox, text: jukugo.preParticle }).appendTo(leftSide);
+      new TextView({ class: 'particle', text: jukugo.preParticle })
+        .set({ top: 29, right: kanjiBox })
+        .appendTo(leftSide);
     }
     prev = 0;
     jukugo.tags.forEach(tag => {
       prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
     })
     this.createComponentsDisplay(jukugo.components, 2).set({ left: 0, top: 5, right: 0 }).appendTo(rightSide);
-    new TextView({ class: 'meaning', top: 'prev()', text: jukugo.translation }).appendTo(rightSide);
+    new TextView({ class: 'meaning', text: jukugo.translation }).set({ top: 'prev()' }).appendTo(rightSide);
     if (jukugo.description) {
-      new TextView({ class: 'description', top: 'prev()', text: jukugo.description }).appendTo(rightSide);
+      new TextView({ class: 'description', text: jukugo.description }).set({ top: 'prev()' }).appendTo(rightSide);
     }
     return composite;
   }

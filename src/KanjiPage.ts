@@ -8,9 +8,11 @@ const TEMP_KUN_KANJI_SETTING = true;
 const COLUMN_WIDTH = 110;
 
 export default class KanjiPage extends Page {
+  private kanji: string;
 
   constructor(data: IDictionaryEntry, title?: string) {
     super();
+    this.kanji = data.kanji;
     this.title = title + '  ' + data.kanji;
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
@@ -80,36 +82,51 @@ export default class KanjiPage extends Page {
 
   createKunyomiDisplay(kunyomi: IKunyomi) {
     let composite = new Composite({ class: 'kunyomi' });
+    let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(composite);
+    let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
     let offset = 5;
+    let topMargin = TEMP_KUN_KANJI_SETTING ? 8 : 0;
     let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi) })
-      .set({ left: 0, top: 0 })
-      .appendTo(composite);
-    let prev = new TextView({ class: 'meaning', left: stars, text: kunyomi.translation })
-      .set({ top: [stars, 3], right: 0 })
-      .appendTo(composite);
+      .set({ top: 0, right: 0 })
+      .appendTo(leftSide);
+    new TextView({ class: 'meaning', left: stars, text: kunyomi.translation })
+      .set({ top: 20, left: 0 })
+      .appendTo(rightSide);
+    let prev: any = 0;
     if (kunyomi.postParticle != null) {
       prev = new TextView({ class: 'particle', text: kunyomi.postParticle })
-        .set({ right: [prev, offset], top: stars })
-        .appendTo(composite);
+        .set({ right: [prev, offset], top: [stars, topMargin] })
+        .appendTo(leftSide);
       offset = 0;
     }
     if (kunyomi.okurigana != null) {
       prev = new TextView({ class: 'kana', text: kunyomi.okurigana })
-        .set({ right: [prev, offset], top: stars })
-        .appendTo(composite);
+        .set({ right: [prev, offset], top: [stars, topMargin] })
+        .appendTo(leftSide);
       offset = 0;
-      if (TEMP_KUN_KANJI_SETTING) {
+      if (!TEMP_KUN_KANJI_SETTING) {
         prev = new TextView({ class: 'kana', text: '*' })
           .set({ right: prev, top: stars })
-          .appendTo(composite);
+          .appendTo(leftSide);
       }
     }
-    prev = new TextView({ class: 'kana', text: kunyomi.reading })
-      .set({ right: [prev, offset], top: stars })
-      .appendTo(composite);
+    if (!TEMP_KUN_KANJI_SETTING) {
+      prev = new TextView({ class: 'kana', text: kunyomi.reading })
+        .set({ right: [prev, offset], top: stars })
+        .appendTo(leftSide);
+    } else {
+      let kanjiBox = new Composite().set({ right: [prev, offset], top: 15 }).appendTo(leftSide)
+      new TextView({ class: 'furigana', text: kunyomi.reading })
+        .set({ top: 2, centerX: 0 })
+        .appendTo(kanjiBox);
+      new TextView({ class: 'kanji', text: this.kanji })
+        .set({ top: 10, centerX: 0 })
+        .appendTo(kanjiBox);
+      prev = kanjiBox;
+    }
     if (kunyomi.preParticle != null) {
       prev = new TextView({ class: 'particle', text: kunyomi.preParticle })
-        .set({ right: prev, top: stars })
+        .set({ right: prev, top: [stars, topMargin] })
         .appendTo(composite);
     }
     return composite;
@@ -172,7 +189,7 @@ export default class KanjiPage extends Page {
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100 },
       '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
       '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
-      '.kunyomi': { top: ['prev()', 0], left: 20, right: 20 },
+      '.kunyomi': { top: ['prev()', 0], left: 0, right: 20 },
       '#jukugoLabel': { left: 10, top: ['prev()', 5] },
       '.jukugo': { top: ['prev()', 0], left: 0, right: 20 },
       '.seperator': { top: ['prev()', 3], left: 20, right: 20 }

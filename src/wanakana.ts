@@ -36,6 +36,10 @@ wanakana.UPPERCASE_FULLWIDTH_START = 0xFF21;
 
 wanakana.UPPERCASE_FULLWIDTH_END = 0xFF3A;
 
+wanakana.KANJI_START =  0x4e00;
+
+wanakana.KANJI_END =  0x9faf;
+
 wanakana.defaultOptions = {
   useObseleteKana: false,
   IMEMode: false,
@@ -123,7 +127,7 @@ wanakana._isCharKatakana = function (char) {
   return wanakana._isCharInRange(char, wanakana.KATAKANA_START, wanakana.KATAKANA_END);
 };
 
-wanakana._isCharHiragana = function (char) {  
+wanakana._isCharHiragana = function (char) {
   return wanakana._isCharInRange(char, wanakana.HIRAGANA_START, wanakana.HIRAGANA_END);
 };
 
@@ -133,6 +137,10 @@ wanakana._isCharKana = function (char) {
 
 wanakana._isCharNotKana = function (char) {
   return !wanakana._isCharHiragana(char) && !wanakana._isCharKatakana(char);
+};
+
+wanakana._isCharKanji = function (char) {
+  return wanakana._isCharInRange(char, wanakana.KANJI_START, wanakana.KANJI_END);
 };
 
 wanakana._convertFullwidthCharsToASCII = function (string) {
@@ -352,6 +360,12 @@ export function isHiragana(input: string) {
   return chars.every(wanakana._isCharHiragana);
 };
 
+export function isKanji(input: string) {
+  var chars;
+  chars = stringToArray(input);
+  return chars.every(wanakana._isCharKanji);
+}
+
 export function isKatakana(input: string) {
   var chars;
   chars = stringToArray(input);
@@ -384,7 +398,7 @@ export function toHiragana(input: string, options?) {
   return input;
 };
 
-export function toKatakana(input: string, options?) {  
+export function toKatakana(input: string, options?) {
   if (isRomaji(input)) {
     input = wanakana._romajiToHiragana(input, options);
     return input = wanakana._hiraganaToKatakana(input, options);

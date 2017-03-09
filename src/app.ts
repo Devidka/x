@@ -4,6 +4,7 @@ import KanjiPage from './Kanjipage';
 import EntryCollectionView from './EntryCollectionView';
 import { toHiragana, toKatakana, toRomaji, isHiragana, isRomaji, isKana, isKanji, getKanji } from './wanakana'
 import { findKanji } from "./util";
+import FloatingWindow from "./FloatingWindow";
 
 export var config = {
   onMode: "romaji"
@@ -16,6 +17,7 @@ var navigationView = new NavigationView({
 var page = new Page({
   title: 'Kanji Damage'
 }).appendTo(navigationView);
+
 new Action({
   placementPriority: "low",
   title: "toggleKana"
@@ -33,6 +35,14 @@ new Action({
   console.error("onyomi now displayed as " + config.onMode);
 }).appendTo(navigationView);
 
+new Action({
+  placementPriority: "high",
+  title: "filter"
+}).on('select', () => {
+  let floatingWindow = new FloatingWindow({centerX: 0, top: 50, height: 200});
+  new Button({top: 10, left: 10, right: 10, text: 'asfasdfasdf'}).appendTo(floatingWindow);
+}).appendTo(navigationView);
+
 new SearchAction({
   title: 'Search',
   image: {
@@ -44,15 +54,6 @@ new SearchAction({
 }).on('accept', function (widget, query) {
   search(query);
 }).appendTo(navigationView);
-
-
-// new Button({
-//   text: 'Open Search',
-//   centerX: 0,
-//   top: 'prev() 10'
-// }).on('select', function() {
-//   action.open();
-// }).appendTo(searchBox);
 
 let dictionary: IDictionaryEntry[] = [];
 

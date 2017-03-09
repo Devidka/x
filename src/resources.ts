@@ -7,7 +7,8 @@ export let colors = {
   translation: '#46a546',
   particle: '#06c',
   component: '#9d261d',
-  link: '#08c'
+  link: '#08c',
+  backgroundBlur: 'rgba(120,120,120,0.3)'
 }
 
 export let fonts = {

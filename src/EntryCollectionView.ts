@@ -12,6 +12,7 @@ export default class EntryCollectionView extends CollectionView {
   }
 
   constructor(data: IDictionaryEntry[], properties?) {
+    properties = properties || {};
     properties.items = data;
     properties.itemHeight = 60;
     properties.initializeCell = (cell) => {

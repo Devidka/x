@@ -3,14 +3,14 @@ import { CollectionView, Composite, Cell, TextView, ImageView, device, ui } from
 import KanjiPage from './Kanjipage';
 
 
-export default class EntryCollection extends CollectionView {
+export default class EntryCollectionView extends CollectionView {
 
   private data: IDictionaryEntry[];
 
   get length(): number {
     return this.data.length;
   }
-  
+
   constructor(data: IDictionaryEntry[], properties) {
     properties.items = data;
     properties.itemHeight = 60;

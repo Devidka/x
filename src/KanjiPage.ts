@@ -186,7 +186,7 @@ export default class KanjiPage extends Page {
       '#components': { left: 20, top: ['#onLabel', 5] },
       '#meaning': { left: ['.mainKanji', 10], top: 38, right: 100 },
       '#onLabel': { left: ['.mainKanji', 10], top: ['#meaning', 0] },
-      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: 100 },
+      '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: '.tag' },
       '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
       '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
       '.kunyomi': { top: ['prev()', 0], left: 0, right: 20 },

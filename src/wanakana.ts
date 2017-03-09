@@ -366,6 +366,12 @@ export function isKanji(input: string) {
   return chars.every(wanakana._isCharKanji);
 }
 
+export function getKanji(input: string) {
+  var chars;
+  chars = stringToArray(input);
+  return chars.filter(isKanji);
+}
+
 export function isKatakana(input: string) {
   var chars;
   chars = stringToArray(input);
@@ -384,7 +390,7 @@ export function isRomaji(input: string) {
   var chars;
   chars = stringToArray(input);
   return chars.every(function (char) {
-    return (!isHiragana(char)) && (!isKatakana(char));
+    return (!isHiragana(char)) && (!isKatakana(char) && (!isKanji(char)));
   });
 };
 

@@ -1,8 +1,9 @@
 import { Action, NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui, WebView } from 'tabris';
 import { IDictionaryEntry } from './interfaces';
 import KanjiPage from './Kanjipage';
-import EntryCollection from './EntryCollection';
-import { toHiragana, toKatakana, toRomaji, isHiragana } from './wanakana'
+import EntryCollectionView from './EntryCollectionView';
+import { toHiragana, toKatakana, toRomaji, isHiragana, isRomaji, isKana, isKanji, getKanji } from './wanakana'
+import { findKanji } from "./util";
 
 export var config = {
   onMode: "romaji"
@@ -13,7 +14,7 @@ var navigationView = new NavigationView({
 }).appendTo(ui.contentView);
 
 var page = new Page({
-  title: 'Search action'
+  title: 'Kanji Damage'
 }).appendTo(navigationView);
 new Action({
   placementPriority: "low",
@@ -41,7 +42,7 @@ new SearchAction({
 }).on('select', function () {
   this.text = '';
 }).on('accept', function (widget, query) {
-  //searchKanji(query);
+  search(query);
 }).appendTo(navigationView);
 
 
@@ -60,8 +61,8 @@ let dictionary: IDictionaryEntry[] = [];
 fetch('../KanjiDamage.json')
   .then(response => response.json().then(json => dictionary = json)
     .then(() => {
-      new EntryCollection(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
-        .on('select', (collection: EntryCollection, entry, { index }) => {
+      new EntryCollectionView(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
+        .on('select', (collection: EntryCollectionView, entry, { index }) => {
           let entryNum = index;
           let openNextPage = (event?: { target: Page, offset: number }) => {
             if (event) {
@@ -78,23 +79,20 @@ fetch('../KanjiDamage.json')
 
 
 
-// function searchKanji(value) {
-//   fetch('../KanjiDamage.json')
-//     .then(response => response.json())
-//     .then(json => dictionary = json)
-//     .then(() => {
-//       let result = dictionary.filter(entry => entry.kanji === value)[0];
-//       if (result) {
-//         //textView.text = result.kanji;
-//       } else {
-//         if (parseInt(value)) {
-//           //textView.text = dictionary[parseInt(value)].kanji;
-//           new KanjiPage(dictionary[parseInt(value)])
-//             .appendTo(navigationView);
-//         }
-//       }
-//     }).catch(err => console.log(err));
-// }
-// export function openPage(pageNum) {
-//   new KanjiPage(dictionary[pageNum - 1]).appendTo(navigationView);
-// }
+function search(value) {
+  let searchResults = new Page({ title: "search for \"" + value + "\" " }).appendTo(navigationView);
+  new EntryCollectionView(findKanji(dictionary, getKanji(value)), { left: 0, top: 0, right: 0, bottom: 0 })
+    .on('select', (collection: EntryCollectionView, entry, { index }) => {
+      let entryNum = index;
+      let openNextPage = (event?: { target: Page, offset: number }) => {
+        if (event) {
+          event.target.dispose();
+          entryNum = (entryNum + event.offset) % collection.length;
+          entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
+        }
+        new KanjiPage(collection.getEntry(entryNum), (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
+      };
+      openNextPage();
+    }).appendTo(searchResults);
+
+}

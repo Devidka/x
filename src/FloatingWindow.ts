@@ -18,5 +18,10 @@ export default class FloatingWindow extends Composite {
     this.appendTo(this.backgroundBlur);
   }
 
+  dispose() {
+    this.backgroundBlur.dispose();
+    super.dispose();
+  }
+
 
 }

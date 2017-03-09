@@ -1,11 +1,13 @@
 import { IDictionaryEntry } from './Interfaces';
 import { CollectionView, Composite, Cell, TextView, ImageView, device, ui } from 'tabris';
 import KanjiPage from './Kanjipage';
+import { getUsefulnessStars } from "./util";
+import { applyColors, applyFonts } from "./resources";
 
 
 export default class EntryCollectionView extends CollectionView {
 
-  private data: IDictionaryEntry[];
+  data: IDictionaryEntry[];
 
   get length(): number {
     return this.data.length;
@@ -13,25 +15,24 @@ export default class EntryCollectionView extends CollectionView {
 
   constructor(data: IDictionaryEntry[], properties?) {
     properties = properties || {};
+    properties.class = 'entryCollectionView';
     properties.items = data;
     properties.itemHeight = 60;
     properties.initializeCell = (cell) => {
-      new Composite({
-        left: 0, right: 0, bottom: 0, height: 1,
-        background: '#bbb'
-      }).appendTo(cell);
-      var kanjiText = new TextView({
-        left: 10, centerY: 0,
-        font: '30px',
-      }).appendTo(cell);
-      var meaningText = new TextView({
-        left: [kanjiText, 10], centerY: 0,
-        font: '20px',
-        textColor: 'green'
-      }).appendTo(cell);
+      cell.append(
+        new TextView({ class: 'usefulness', left: 5, top: 0 }),
+        new TextView({ class: 'kanjiText', left: 10, top: 'prev()', font: '30px', }),
+        new TextView({ class: 'meaningText', left: ['.kanjiText', 10], top: 25, font: '20px', textColor: 'green' }),
+        new Composite({ left: 0, right: 0, bottom: 0, height: 1, background: '#bbb' })
+      )
       cell.on('change:item', function (widget, entry) {
-        kanjiText.text = entry.kanji;
-        meaningText.text = entry.meaning;
+        cell.apply({
+          '.kanjiText': { text: entry.kanji },
+          '.meaningText': { text: entry.meaning },
+          '.usefulness': { text: getUsefulnessStars(entry) }
+        });
+        applyColors(cell);
+        applyFonts(cell);
       });
     };
     super(properties);

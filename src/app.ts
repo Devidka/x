@@ -39,8 +39,22 @@ new Action({
   placementPriority: "high",
   title: "filter"
 }).on('select', () => {
-  let floatingWindow = new FloatingWindow({centerX: 0, top: 50, height: 200});
-  new Button({top: 10, left: 10, right: 10, text: 'asfasdfasdf'}).appendTo(floatingWindow);
+  let floatingWindow = new FloatingWindow({ centerX: 0, centerY: 0 });
+  new Button({ top: 10, left: 10, right: 10, bottom: 10, text: 'By usefulness' }).on('select', () => {
+    let usefulnessWindow = new FloatingWindow({ centerX: 0, centerY: 0 });
+    for (let i = 0; i < 6; i++) {
+      new Button({ left: 10, right: 10, top: 'prev()', text: '>' + i }).on('select', () => {
+        floatingWindow.dispose();
+        usefulnessWindow.dispose();
+        let entryCollectionView = navigationView.pages().first().find('.entryCollectionView').first() as EntryCollectionView;
+        let data = entryCollectionView.data;
+        let filterResults = new Page({ title: "filter results" }).appendTo(navigationView);
+        createSearchResultEntryCollectionView(data.filter(entry => entry.usefulness > i))
+          .set({ left: 0, top: 0, right: 0, bottom: 0 })
+          .appendTo(filterResults);
+      }).appendTo(usefulnessWindow);
+    }
+  }).appendTo(floatingWindow);
 }).appendTo(navigationView);
 
 new SearchAction({

@@ -17,10 +17,6 @@ export default class KanjiPage extends Page {
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
-    let prev = scrollView.find('.strokeCount')[0];
-    data.tags.forEach(tag => {
-      prev = createTag(tag).set({ top: [prev, 2], right: 10 }).appendTo(scrollView);
-    })
     scrollView.append(
       createKanji(data, MAIN_KANJI_SIZE),
       this.createComponentsDisplay(data.components).set("id", "components"),
@@ -46,6 +42,10 @@ export default class KanjiPage extends Page {
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
         });
     }
+    let prev = scrollView.find('.strokeCount')[0];
+    data.tags.forEach(tag => {
+      prev = createTag(tag).set({ top: [prev, 2], right: 10 }).appendTo(scrollView);
+    })
     data.lookalikeSets.forEach(set => {
       this.createLookalikeDisplay(set);
     });

@@ -57,31 +57,22 @@ new SearchAction({
 let dictionary: IDictionaryEntry[] = [];
 
 
-// TODO: kill that pyramid
-fetch('../KanjiDamage.json')
-  .then(response => response.json().then(json => dictionary = json)
-    .then(() => {
-      new EntryCollectionView(dictionary, { left: 0, top: 0, right: 0, bottom: 0 })
-        .on('select', (collection: EntryCollectionView, entry, { index }) => {
-          let entryNum = index;
-          let openNextPage = (event?: { target: Page, offset: number }) => {
-            if (event) {
-              event.target.dispose();
-              entryNum = (entryNum + event.offset) % collection.length;
-              entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
-            }
-            new KanjiPage(collection.getEntry(entryNum), (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
-          };
-          openNextPage();
-        }).appendTo(page);
-    })
-  );
-
-
+fetch('../KanjiDamage.json').then(response => response.json().then(json => dictionary = json).then(() => {
+  createSearchResultEntryCollectionView(dictionary)
+    .set({ left: 0, top: 0, right: 0, bottom: 0 })
+    .appendTo(page);
+})
+);
 
 function search(value) {
   let searchResults = new Page({ title: "search for \"" + value + "\" " }).appendTo(navigationView);
-  new EntryCollectionView(findKanji(dictionary, getKanji(value)), { left: 0, top: 0, right: 0, bottom: 0 })
+  createSearchResultEntryCollectionView(findKanji(dictionary, getKanji(value)))
+    .set({ left: 0, top: 0, right: 0, bottom: 0 })
+    .appendTo(searchResults);
+}
+
+function createSearchResultEntryCollectionView(dictionary: IDictionaryEntry[]) {
+  return new EntryCollectionView(dictionary)
     .on('select', (collection: EntryCollectionView, entry, { index }) => {
       let entryNum = index;
       let openNextPage = (event?: { target: Page, offset: number }) => {
@@ -93,6 +84,5 @@ function search(value) {
         new KanjiPage(collection.getEntry(entryNum), (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
       };
       openNextPage();
-    }).appendTo(searchResults);
-
+    })
 }

@@ -1,10 +1,28 @@
 import { IKanji, IJukugo } from './Interfaces';
-import { CollectionView, Composite, Cell, TextView, ImageView, device, ui } from 'tabris';
+import { CollectionView, Composite, Cell, TextView, ImageView, device, ui, Page } from 'tabris';
 import KanjiPage from './Kanjipage';
 import { getUsefulnessStars, getType } from "./util";
 import { applyColors, applyFonts, fonts } from "./resources";
+import { navigationView } from "./app";
 
 export default class EntryCollectionView extends CollectionView {
+
+  static createSearchResultEntryCollectionView(dictionary: (IKanji | IJukugo)[]) {
+  return new EntryCollectionView(dictionary)
+    .on('select', (collection: EntryCollectionView, entry, { index }) => {
+      let entryNum = index;
+      let openNextPage = (event?: { target: Page, offset: number }) => {
+        if (event) {
+          event.target.dispose();
+          entryNum = (entryNum + event.offset) % collection.length;
+          entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
+        }
+        new KanjiPage(collection.getEntry(entryNum) as IKanji, (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
+      };
+      openNextPage();
+    })
+}
+
 
   data: (IKanji | IJukugo)[];
 

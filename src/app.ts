@@ -41,13 +41,14 @@ new Action({
   title: "filter"
 }).on('select', () => {
   let floatingWindow = new FloatingWindow({ centerX: 0, centerY: 0 });
-  new Button({ top: 10, left: 10, right: 10, bottom: 10, text: 'By usefulness' }).on('select', () => {
+  new Button({ top: 10, left: 10, right: 10, text: 'By usefulness' }).on('select', () => {
     let usefulnessWindow = new FloatingWindow({ centerX: 0, centerY: 0 });
     for (let i = 0; i < 6; i++) {
       new Button({ left: 10, right: 10, top: 'prev()', text: '>' + i }).on('select', () => {
         floatingWindow.dispose();
         usefulnessWindow.dispose();
-        let entryCollectionView = navigationView.pages().first().find('.entryCollectionView').first() as EntryCollectionView;
+        let entryCollectionView = navigationView.pages().last().find('.entryCollectionView').first() as EntryCollectionView;
+        console.log((navigationView.pages().first() as Page).title);
         let data = entryCollectionView.data;
         let filterResults = new Page({ title: "filter results" }).appendTo(navigationView);
         createSearchResultEntryCollectionView(data.filter(entry => entry.usefulness > i))
@@ -55,6 +56,23 @@ new Action({
           .appendTo(filterResults);
       }).appendTo(usefulnessWindow);
     }
+  }).appendTo(floatingWindow);
+  new Button({ top: ['prev()', 10], left: 10, right: 10, bottom: 10, text: 'Add Jukugo' }).on('select', () => {
+    floatingWindow.dispose();
+    let entryCollectionView = navigationView.pages().last().find('.entryCollectionView').first() as EntryCollectionView;
+    console.log((navigationView.pages().first() as Page).title);
+    let data = entryCollectionView.data;
+    let newData: (IKanji | IJukugo)[] = [];
+    data.forEach(entry => {
+      newData.push(entry);
+      (entry as IKanji).jukugo.forEach(index => {
+        newData.push(dictionary.jukugo[index]);
+      });
+    });
+    let filterResults = new Page({ title: "filter results" }).appendTo(navigationView);
+    createSearchResultEntryCollectionView(newData)
+      .set({ left: 0, top: 0, right: 0, bottom: 0 })
+      .appendTo(filterResults);
   }).appendTo(floatingWindow);
 }).appendTo(navigationView);
 
@@ -86,7 +104,7 @@ function search(value) {
     .appendTo(searchResults);
 }
 
-function createSearchResultEntryCollectionView(dictionary: IKanji[]) {
+function createSearchResultEntryCollectionView(dictionary: (IKanji | IJukugo)[]) {
   return new EntryCollectionView(dictionary)
     .on('select', (collection: EntryCollectionView, entry, { index }) => {
       let entryNum = index;
@@ -96,7 +114,7 @@ function createSearchResultEntryCollectionView(dictionary: IKanji[]) {
           entryNum = (entryNum + event.offset) % collection.length;
           entryNum = (entryNum < 0) ? collection.length + entryNum : entryNum;
         }
-        new KanjiPage(collection.getEntry(entryNum), (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
+        new KanjiPage(collection.getEntry(entryNum) as IKanji, (entryNum + 1) + '/' + collection.length).on('navigate', openNextPage).appendTo(navigationView);
       };
       openNextPage();
     })

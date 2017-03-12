@@ -1,7 +1,8 @@
 import { Page, TextView, ScrollView, ImageView, Composite, Widget } from 'tabris';
-import { IDictionaryEntry, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
+import { IKanji, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
 import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag } from './util';
 import { applyColors, applyFonts } from './resources';
+import { dictionary } from "./app";
 
 const MAIN_KANJI_SIZE = 80;
 const TEMP_KUN_KANJI_SETTING = true;
@@ -10,7 +11,7 @@ const COLUMN_WIDTH = 110;
 export default class KanjiPage extends Page {
   private kanji: string;
 
-  constructor(data: IDictionaryEntry, title?: string) {
+  constructor(data: IKanji, title?: string) {
     super();
     this.kanji = data.kanji;
     this.title = title + '  ' + data.kanji;
@@ -24,21 +25,21 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'strokeCount', text: data.strokeCount + ' strokes' }),
       new TextView({ id: 'meaning', text: data.meaning }),
       new TextView({ class: 'number', text: 'number ' + data.number }),
-      new TextView({ class: 'label', id: 'onLabel', text: 'On: ' }),
+      new TextView({ class: 'jukugoIndex', id: 'onLabel', text: 'On: ' }),
       new TextView({ class: 'onyomi', text: getOnyomi(data) }),
       new TextView({ class: 'mnemonic', text: data.mnemonic, markupEnabled: true })
     )
     if (data.kunyomi && data.kunyomi.length > 0) {
-      new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView),
+      new TextView({ class: 'jukugoIndex', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView),
         data.kunyomi.forEach(kunyomi => {
           this.createKunyomiDisplay(kunyomi).appendTo(scrollView);
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
         });
     }
     if (data.jukugo && data.jukugo.length > 0) {
-      new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView),
-        data.jukugo.forEach(jukugo => {
-          this.createJukugoDisplay(jukugo).appendTo(scrollView);
+      new TextView({ class: 'jukugoIndex', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView),
+        data.jukugo.forEach(jukugoIndex => {
+          this.createJukugoDisplay(dictionary.jukugo[jukugoIndex]).appendTo(scrollView);
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
         });
     }
@@ -89,7 +90,7 @@ export default class KanjiPage extends Page {
     let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi) })
       .set({ top: 0, right: 0 })
       .appendTo(leftSide);
-    new TextView({ class: 'meaning', left: stars, text: kunyomi.translation })
+    new TextView({ class: 'meaning', left: stars, text: kunyomi.meaning })
       .set({ top: 20, left: 0 })
       .appendTo(rightSide);
     let prev: any = 0;
@@ -162,7 +163,7 @@ export default class KanjiPage extends Page {
       prev = createTag(tag, 12).set({ top: kanjiBox, right: [prev, 3] }).appendTo(leftSide);
     })
     this.createComponentsDisplay(jukugo.components, 2).set({ left: 0, top: 5, right: 0 }).appendTo(rightSide);
-    new TextView({ class: 'meaning', text: jukugo.translation }).set({ top: 'prev()' }).appendTo(rightSide);
+    new TextView({ class: 'meaning', text: jukugo.meaning }).set({ top: 'prev()' }).appendTo(rightSide);
     if (jukugo.description) {
       new TextView({ class: 'description', text: jukugo.description }).set({ top: 'prev()' }).appendTo(rightSide);
     }

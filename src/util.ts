@@ -2,7 +2,7 @@ import { TextView, ImageView, Composite } from 'tabris';
 import { toHiragana, toKatakana } from './wanakana';
 import { config } from './app';
 import { colors } from './resources';
-import { IDictionaryEntry } from "./interfaces";
+import { IKanji } from "./interfaces";
 
 export function parseImage(tag) {
   return '../images/dictionary/' + tag.split('"')[1];
@@ -51,6 +51,6 @@ export function createTag(tag: string, size = 16) {
   );
 }
 
-export function findKanji(collection: IDictionaryEntry[], kanji: string[]) {
+export function findKanji(collection: IKanji[], kanji: string[]) {
   return collection.filter((entry => kanji.indexOf(entry.kanji) != -1));
 }

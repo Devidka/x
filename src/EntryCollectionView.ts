@@ -1,4 +1,4 @@
-import { IDictionaryEntry } from './Interfaces';
+import { IKanji } from './Interfaces';
 import { CollectionView, Composite, Cell, TextView, ImageView, device, ui } from 'tabris';
 import KanjiPage from './Kanjipage';
 import { getUsefulnessStars } from "./util";
@@ -7,13 +7,13 @@ import { applyColors, applyFonts } from "./resources";
 
 export default class EntryCollectionView extends CollectionView {
 
-  data: IDictionaryEntry[];
+  data: IKanji[];
 
   get length(): number {
     return this.data.length;
   }
 
-  constructor(data: IDictionaryEntry[], properties?) {
+  constructor(data: IKanji[], properties?) {
     properties = properties || {};
     properties.class = 'entryCollectionView';
     properties.items = data;
@@ -39,7 +39,7 @@ export default class EntryCollectionView extends CollectionView {
     this.data = data;
   }
 
-  public getEntry(index: number): IDictionaryEntry {
+  public getEntry(index: number): IKanji {
     return this.data[index];
   }
 

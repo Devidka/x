@@ -1,23 +1,25 @@
-export interface IKunyomi {
+type jukugoIndex = number;
+
+export interface IFact {
         tags: string[];
-        preParticle: string;
-        postParticle: string;
-        reading: string;
-        okurigana: string;
-        translation: string;
+        kanji: string; // the word without okurigana
+        meaning: string;
         usefulness: number;
 }
-
-export interface IJukugo {
+export interface IWord extends IFact {
         preParticle: string;
         postParticle: string;
-        kanji: string;
-        reading: string;
-        translation: string;
+        reading: string; // full reading with okurigana
         description: string;
-        usefulness: number;
+}
+
+export interface IKunyomi extends IWord {
+        okurigana: string;
+}
+
+export interface IJukugo extends IWord {
+        okurigana: { pre: string, post: string };
         components: { kanji: string, meaning: string }[];
-        tags: string[];
 }
 
 export interface ILookalikeSet {
@@ -25,21 +27,17 @@ export interface ILookalikeSet {
         lookalikeMnemonics: string[]
 }
 
-export interface IDictionaryEntry {
-  number: number;
-  kanji: string;
-  kanjiImageSource: string;
-  strokeCount: number;
-  meaning: string;
-  usefulness: number;
-  tags: string[];
-  strokeOrderImageSource: string;
-  components: {kanji: string, kanjiImageSource: string, meaning: string}[];
-  onyomi: string[];
-  mnemonic: string;
-  kunyomi: IKunyomi[];
-  jukugo: IJukugo[];
-  frequencyRating: number;
-  usedIn: { kanji: string, kanjiImageSource: string }[];
-  lookalikeSets: ILookalikeSet[];
+export interface IKanji extends IFact {
+        number: number;
+        kanjiImageSource: string;
+        strokeCount: number;
+        strokeOrderImageSource: string;
+        components: { kanji: string, kanjiImageSource: string, meaning: string }[];
+        onyomi: string[];
+        mnemonic: string;
+        kunyomi: IKunyomi[];
+        jukugo: jukugoIndex[];
+        frequencyRating: number;
+        usedIn: { kanji: string, kanjiImageSource: string }[];
+        lookalikeSets: ILookalikeSet[];
 }

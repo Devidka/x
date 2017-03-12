@@ -1,5 +1,5 @@
 import { Action, NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui, WebView } from 'tabris';
-import { IDictionaryEntry } from './interfaces';
+import { IKanji, IJukugo } from './interfaces';
 import KanjiPage from './Kanjipage';
 import EntryCollectionView from './EntryCollectionView';
 import { toHiragana, toKatakana, toRomaji, isHiragana, isRomaji, isKana, isKanji, getKanji } from './wanakana'
@@ -9,6 +9,7 @@ import FloatingWindow from "./FloatingWindow";
 export var config = {
   onMode: "romaji"
 }
+export var dictionary: { kanji: IKanji[], jukugo: IJukugo[] };
 
 var navigationView = new NavigationView({
   left: 0, top: 0, right: 0, bottom: 0, animated: false
@@ -69,11 +70,10 @@ new SearchAction({
   search(query);
 }).appendTo(navigationView);
 
-let dictionary: IDictionaryEntry[] = [];
 
 
 fetch('../KanjiDamage.json').then(response => response.json().then(json => dictionary = json).then(() => {
-  createSearchResultEntryCollectionView(dictionary)
+  createSearchResultEntryCollectionView(dictionary.kanji)
     .set({ left: 0, top: 0, right: 0, bottom: 0 })
     .appendTo(page);
 })
@@ -81,12 +81,12 @@ fetch('../KanjiDamage.json').then(response => response.json().then(json => dicti
 
 function search(value) {
   let searchResults = new Page({ title: "search for \"" + value + "\" " }).appendTo(navigationView);
-  createSearchResultEntryCollectionView(findKanji(dictionary, getKanji(value)))
+  createSearchResultEntryCollectionView(findKanji(dictionary.kanji, getKanji(value)))
     .set({ left: 0, top: 0, right: 0, bottom: 0 })
     .appendTo(searchResults);
 }
 
-function createSearchResultEntryCollectionView(dictionary: IDictionaryEntry[]) {
+function createSearchResultEntryCollectionView(dictionary: IKanji[]) {
   return new EntryCollectionView(dictionary)
     .on('select', (collection: EntryCollectionView, entry, { index }) => {
       let entryNum = index;

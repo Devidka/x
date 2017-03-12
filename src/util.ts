@@ -21,6 +21,17 @@ export function createKanji(data: { kanji: string, kanjiImageSource?: string }, 
   return new TextView({ class: 'mainKanji', text: data.kanji, font: size + 'px' });
 }
 
+export function createKanjiWithFurigana(kanji: string, furigana: string) {
+  let kanjiBox = new Composite();
+  new TextView({ class: 'furigana', text: furigana })
+    .set({ top: 2, centerX: 0 })
+    .appendTo(kanjiBox);
+  new TextView({ class: 'kanji', text: kanji })
+    .set({ top: 10, centerX: 0 })
+    .appendTo(kanjiBox);
+  return kanjiBox;
+}
+
 export function getOnyomi(data: { onyomi: string[] }) {
   let result = [];
   for (let yomi of data.onyomi) {

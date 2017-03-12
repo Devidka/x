@@ -1,6 +1,6 @@
 import { Page, TextView, ScrollView, ImageView, Composite, Widget } from 'tabris';
 import { IKanji, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
-import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag } from './util';
+import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag, createKanjiWithFurigana } from './util';
 import { applyColors, applyFonts } from './resources';
 import { dictionary } from "./app";
 
@@ -25,19 +25,19 @@ export default class KanjiPage extends Page {
       new TextView({ class: 'strokeCount', text: data.strokeCount + ' strokes' }),
       new TextView({ id: 'meaning', text: data.meaning }),
       new TextView({ class: 'number', text: 'number ' + data.number }),
-      new TextView({ class: 'jukugoIndex', id: 'onLabel', text: 'On: ' }),
+      new TextView({ class: 'label', id: 'onLabel', text: 'On: ' }),
       new TextView({ class: 'onyomi', text: getOnyomi(data) }),
       new TextView({ class: 'mnemonic', text: data.mnemonic, markupEnabled: true })
     )
     if (data.kunyomi && data.kunyomi.length > 0) {
-      new TextView({ class: 'jukugoIndex', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView),
+      new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView),
         data.kunyomi.forEach(kunyomi => {
           this.createKunyomiDisplay(kunyomi).appendTo(scrollView);
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
         });
     }
     if (data.jukugo && data.jukugo.length > 0) {
-      new TextView({ class: 'jukugoIndex', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView),
+      new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView),
         data.jukugo.forEach(jukugoIndex => {
           this.createJukugoDisplay(dictionary.jukugo[jukugoIndex]).appendTo(scrollView);
           new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
@@ -90,7 +90,7 @@ export default class KanjiPage extends Page {
     let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi) })
       .set({ top: 0, right: 0 })
       .appendTo(leftSide);
-    new TextView({ class: 'meaning', left: stars, text: kunyomi.meaning })
+    new TextView({ class: 'meaning', left: stars, text: kunyomi.description })
       .set({ top: 20, left: 0 })
       .appendTo(rightSide);
     let prev: any = 0;
@@ -116,13 +116,7 @@ export default class KanjiPage extends Page {
         .set({ right: [prev, offset], top: stars })
         .appendTo(leftSide);
     } else {
-      let kanjiBox = new Composite().set({ right: [prev, offset], top: 15 }).appendTo(leftSide)
-      new TextView({ class: 'furigana', text: kunyomi.reading })
-        .set({ top: 2, centerX: 0 })
-        .appendTo(kanjiBox);
-      new TextView({ class: 'kanji', text: this.kanji })
-        .set({ top: 10, centerX: 0 })
-        .appendTo(kanjiBox);
+      let kanjiBox = createKanjiWithFurigana(this.kanji, kunyomi.reading).set({ right: [prev, offset], top: 15 }).appendTo(leftSide)
       prev = kanjiBox;
     }
     if (kunyomi.preParticle != null) {
@@ -146,16 +140,24 @@ export default class KanjiPage extends Page {
         .set({ top: 29, right: prev })
         .appendTo(leftSide);
     }
-    let kanjiBox = new Composite({ right: prev, top: 15 }).appendTo(leftSide);
-    new TextView({ class: 'furigana', text: jukugo.reading })
-      .set({ top: 2, centerX: 0 })
-      .appendTo(kanjiBox);
-    new TextView({ class: 'kanji', text: jukugo.kanji })
-      .set({ top: 10, centerX: 0 })
-      .appendTo(kanjiBox);
+    if (jukugo.okurigana.post != null) {
+      prev = new TextView({ class: 'post okurigana', text: jukugo.okurigana.post })
+        .set({ top: 26, right: prev })
+        .appendTo(leftSide);
+    }
+
+    let kanjiBox = createKanjiWithFurigana(jukugo.kanji, jukugo.reading).set({ right: prev, top: 15 }).appendTo(leftSide);
+    prev = kanjiBox;
+
+    if (jukugo.okurigana.pre != null) {
+      prev = new TextView({ class: 'pre okurigana', text: jukugo.okurigana.pre })
+        .set({ top: 26, right: prev })
+        .appendTo(leftSide);
+    }
+
     if (jukugo.preParticle != null) {
       new TextView({ class: 'particle', text: jukugo.preParticle })
-        .set({ top: 29, right: kanjiBox })
+        .set({ top: 29, right: prev })
         .appendTo(leftSide);
     }
     prev = 0;

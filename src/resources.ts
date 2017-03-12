@@ -53,7 +53,8 @@ export function applyFonts(composite: Composite) {
     '.description': {font: fonts.smallText},
     '.furigana': {font: fonts.furigana},
     '.particle': {font: fonts.particle},
-    '.kana': {font: fonts.bigText},
+    '.kana': { font: fonts.bigText },
+    '.okurigana': {font: fonts.kanji},
     '.kanji': {font: fonts.kanji},
     '.component': {font: fonts.component},
     '.componentKanji': {font: fonts.component}

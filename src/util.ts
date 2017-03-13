@@ -8,9 +8,9 @@ export function parseImage(tag) {
   return '../images/dictionary/' + tag.split('"')[1];
 }
 
-export function getUsefulnessStars(data: { usefulness: number }) {
+export function getUsefulnessStars(usefulness: number) {
   let stars = '';
-  for (let i = 0; i <= 5; i++) stars += data.usefulness > i ? '★' : '☆';
+  for (let i = 0; i <= 5; i++) stars += usefulness > i ? '★' : '☆';
   return stars;
 }
 

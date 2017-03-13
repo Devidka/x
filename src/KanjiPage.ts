@@ -21,7 +21,7 @@ export default class KanjiPage extends Page {
     scrollView.append(
       createKanji(data, MAIN_KANJI_SIZE),
       this.createComponentsDisplay(data.components).set("id", "components"),
-      new TextView({ class: 'usefulness', id: 'usefulness', text: getUsefulnessStars(data) }),
+      new TextView({ class: 'usefulness', id: 'usefulness', text: getUsefulnessStars(data.usefulness) }),
       new TextView({ class: 'strokeCount', text: data.strokeCount + ' strokes' }),
       new TextView({ id: 'meaning', text: data.meaning }),
       new TextView({ class: 'number', text: 'number ' + data.number }),
@@ -87,7 +87,7 @@ export default class KanjiPage extends Page {
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
     let offset = 5;
     let topMargin = TEMP_KUN_KANJI_SETTING ? 8 : 0;
-    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi) })
+    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(kunyomi.usefulness) })
       .set({ top: 0, right: 0 })
       .appendTo(leftSide);
     new TextView({ class: 'meaning', left: stars, text: kunyomi.description })
@@ -131,7 +131,7 @@ export default class KanjiPage extends Page {
     let composite = new Composite({ class: 'jukugo' });
     let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(composite);
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0, bottom: 0 }).appendTo(composite);
-    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(jukugo) })
+    let stars = new TextView({ class: 'usefulness', text: getUsefulnessStars(jukugo.usefulness) })
       .set({ top: 0, right: 0 })
       .appendTo(leftSide);
     let prev: any = 0;

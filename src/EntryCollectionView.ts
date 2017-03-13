@@ -50,7 +50,7 @@ export default class EntryCollectionView extends CollectionView {
         cell.apply({
           '.kanjiText': { text: kanjiText, font: fonts['entryCollection_' + getType(entry)] },
           '.meaningText': { text: entry.meaning },
-          '.usefulness': { text: getUsefulnessStars(entry) }
+          '.usefulness': { text: getUsefulnessStars(entry.usefulness) }
         });
         // if (getType(entry) === 'jukugo') {
         //   let kanjiTextView = cell.find('.kanjiText').first();

@@ -26,7 +26,7 @@ export let fonts = {
   particle: '16px',
   furigana: '10px',
   kanji: '20px',
-  entryCollection_kanji: '18px',
+  entryCollection_kanji: '30px',
   entryCollection_jukugo: '18px',
   entryCollection_kunyomi: '18px'
 }

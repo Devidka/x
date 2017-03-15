@@ -1,8 +1,8 @@
 import { TextView, ImageView, Composite } from 'tabris';
 import { toHiragana, toKatakana } from './wanakana';
-import { config } from './app';
+import { config, dictionary } from './app';
 import { colors } from './resources';
-import { IKanji } from "./interfaces";
+import { IKanji, IFact } from "./interfaces";
 
 export function parseImage(tag) {
   return '../images/dictionary/' + tag.split('"')[1];
@@ -10,7 +10,8 @@ export function parseImage(tag) {
 
 export function getUsefulnessStars(usefulness: number) {
   let stars = '';
-  for (let i = 0; i <= 5; i++) stars += usefulness > i ? '★' : '☆';
+  for (let i = 0; i < 5; i++) stars += usefulness > i ? '★' : '☆';
+  stars += usefulness == 6 ? '★' : '';
   return stars;
 }
 
@@ -73,4 +74,28 @@ export function getType(object: Object) {
     else return "kunyomi";
   }
   return "undefined";
+}
+
+export function addJukugo(data: IFact[], minUsefulness: number) {
+  let newData = [];
+  let addedJukugo: number[] = [];
+  data.forEach(entry => {
+    newData.push(entry);
+    if (getType(entry) === 'kanji') {
+      (entry as IKanji).jukugo.forEach(jukugoIndex => {
+        let jukugo = dictionary.jukugo[jukugoIndex];
+        // if (jukugoIndex < 5) {
+        //   newData.forEach(oldEntry => {
+        //     if (getType(oldEntry) == 'jukugo' && oldEntry.kanji == jukugo.kanji) {
+        //       console.log(jukugo.kanji + ' ' + newData.indexOf(jukugo));
+        //     }
+        //   });
+        // }
+        if (jukugo.usefulness >= minUsefulness && addedJukugo.indexOf(jukugoIndex) === -1 && data.indexOf(jukugo) === -1) {
+          newData.push(jukugo);
+        }
+      })
+    }
+  });
+  return newData;
 }

@@ -1,11 +1,11 @@
 import { Action, NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui, WebView } from 'tabris';
 import { IKanji, IJukugo } from './interfaces';
 import KanjiPage from './Kanjipage';
-import EntryCollectionView from './EntryCollectionView';
+import EntryCollectionPage from './EntryCollectionPage';
 import { toHiragana, toKatakana, toRomaji, isHiragana, isRomaji, isKana, isKanji, getKanji } from './wanakana'
 import { findKanji } from "./util";
 import FloatingWindow from "./FloatingWindow";
-import CollectionManipulationWindow from "./CollectionManipulationWindow";
+import ExpandCollectionWindow from "./ExpandCollectionWindow";
 
 export var config = {
   onMode: "romaji"
@@ -15,10 +15,6 @@ export var dictionary: { kanji: IKanji[], jukugo: IJukugo[] };
 export var navigationView = new NavigationView({
   left: 0, top: 0, right: 0, bottom: 0, animated: false
 }).appendTo(ui.contentView);
-
-var page = new Page({
-  title: 'Kanji Damage'
-}).appendTo(navigationView);
 
 new Action({
   placementPriority: "low",
@@ -38,10 +34,11 @@ new Action({
 }).appendTo(navigationView);
 
 new Action({
+  id: "expandAction",
   placementPriority: "high",
-  title: "filter"
+  title: "expand"
 }).on('select', () => {
-  CollectionManipulationWindow.Open();
+  new ExpandCollectionWindow();
 }).appendTo(navigationView);
 
 new SearchAction({
@@ -56,19 +53,12 @@ new SearchAction({
   search(query);
 }).appendTo(navigationView);
 
-
+function search(value) {
+  let data = findKanji(dictionary.kanji, getKanji(value));
+  new EntryCollectionPage({data}).appendTo(navigationView);
+}
 
 fetch('../KanjiDamage.json').then(response => response.json().then(json => dictionary = json).then(() => {
-  EntryCollectionView.createSearchResultEntryCollectionView(dictionary.kanji)
-    .set({ left: 0, top: 0, right: 0, bottom: 0 })
-    .appendTo(page);
-})
-);
-
-function search(value) {
-  let searchResults = new Page({ title: "search for \"" + value + "\" " }).appendTo(navigationView);
-  EntryCollectionView.createSearchResultEntryCollectionView(findKanji(dictionary.kanji, getKanji(value)))
-    .set({ left: 0, top: 0, right: 0, bottom: 0 })
-    .appendTo(searchResults);
-}
+  new EntryCollectionPage({data: dictionary.kanji}).appendTo(navigationView);
+}));
 

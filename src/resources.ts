@@ -20,6 +20,7 @@ export let fonts = {
   component: '14px',
   mnemonic: '18px',
   label: '26px',
+  smallLabel: '18px',
   onyomi: '26px',
   bigText: '18px',
   smallText: '16px',
@@ -60,7 +61,7 @@ export function applyFonts(composite: Composite) {
     '.okurigana': {font: fonts.kanji},
     '.kanji': {font: fonts.kanji},
     '.component': {font: fonts.component},
-    '.componentKanji': {font: fonts.component}
-
+    '.componentKanji': {font: fonts.component},
+    '.smallLabel': {font: fonts.smallLabel}
   })
 }

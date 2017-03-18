@@ -1,10 +1,10 @@
 
 import FloatingWindow from "./FloatingWindow";
 import { CompositeProperties, Page, Button, Composite, TextView, RadioButton } from "tabris/tabris";
-import EntryCollectionPage from "./EntryCollectionPage";
+import FactListPage from "./FactListPage";
 import { navigationView, dictionary } from "./app";
 import { IKanji, IJukugo, IFact } from "./interfaces";
-import { getUsefulnessStars, getType, addJukugo } from "./util";
+import { getUsefulnessStars, getType } from "./util";
 import { applyColors, applyFonts } from "./resources";
 
 export default class ExpandCollectionWindow extends FloatingWindow {
@@ -21,10 +21,9 @@ export default class ExpandCollectionWindow extends FloatingWindow {
       new Button({ left: 10, top: 10, right: 10, text: 'add Jukugo' })
         .on('select', () => {
           this.dispose();
-          let currentPage = navigationView.pages().last() as EntryCollectionPage;
-          let newData = addJukugo(currentPage.data, this.minUsefulness);
-          currentPage.dispose();
-          new EntryCollectionPage({title: 'expanded collection', data: newData}).appendTo(navigationView);
+          let currentPage = navigationView.pages().last() as FactListPage;
+          let newData = currentPage.facts.addJukugo(this.minUsefulness);
+          new FactListPage({title: 'expanded collection', facts: newData}).appendTo(navigationView);
         })
         .appendTo(buttonsComposite)
     )

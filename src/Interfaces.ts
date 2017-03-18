@@ -5,6 +5,7 @@ export interface IFact {
         kanji: string; // the word without okurigana
         meaning: string;
         usefulness: number;
+        id: string;
 }
 export interface IWord extends IFact {
         preParticle: string;

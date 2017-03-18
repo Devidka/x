@@ -1,11 +1,12 @@
 import { Action, NavigationView, Page, Composite, TextView, SearchAction, device, Button, ui, WebView } from 'tabris';
 import { IKanji, IJukugo } from './interfaces';
 import KanjiPage from './Kanjipage';
-import EntryCollectionPage from './EntryCollectionPage';
+import FactListPage from './FactListPage';
 import { toHiragana, toKatakana, toRomaji, isHiragana, isRomaji, isKana, isKanji, getKanji } from './wanakana'
 import { findKanji } from "./util";
 import FloatingWindow from "./FloatingWindow";
 import ExpandCollectionWindow from "./ExpandCollectionWindow";
+import FactList from "./FactList";
 
 export var config = {
   onMode: "romaji"
@@ -54,11 +55,11 @@ new SearchAction({
 }).appendTo(navigationView);
 
 function search(value) {
-  let data = findKanji(dictionary.kanji, getKanji(value));
-  new EntryCollectionPage({data}).appendTo(navigationView);
+  let kanji = findKanji(dictionary.kanji, getKanji(value));
+  new FactListPage({facts: new FactList(kanji)}).appendTo(navigationView);
 }
 
 fetch('../KanjiDamage.json').then(response => response.json().then(json => dictionary = json).then(() => {
-  new EntryCollectionPage({data: dictionary.kanji}).appendTo(navigationView);
+  new FactListPage({facts: new FactList(dictionary.kanji)}).appendTo(navigationView);
 }));
 

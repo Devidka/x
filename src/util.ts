@@ -76,26 +76,3 @@ export function getType(object: Object) {
   return "undefined";
 }
 
-export function addJukugo(data: IFact[], minUsefulness: number) {
-  let newData = [];
-  let addedJukugo: number[] = [];
-  data.forEach(entry => {
-    newData.push(entry);
-    if (getType(entry) === 'kanji') {
-      (entry as IKanji).jukugo.forEach(jukugoIndex => {
-        let jukugo = dictionary.jukugo[jukugoIndex];
-        // if (jukugoIndex < 5) {
-        //   newData.forEach(oldEntry => {
-        //     if (getType(oldEntry) == 'jukugo' && oldEntry.kanji == jukugo.kanji) {
-        //       console.log(jukugo.kanji + ' ' + newData.indexOf(jukugo));
-        //     }
-        //   });
-        // }
-        if (jukugo.usefulness >= minUsefulness && addedJukugo.indexOf(jukugoIndex) === -1 && data.indexOf(jukugo) === -1) {
-          newData.push(jukugo);
-        }
-      })
-    }
-  });
-  return newData;
-}

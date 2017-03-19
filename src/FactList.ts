@@ -6,8 +6,14 @@ export default class FactList {
   private _data: IFact[];
   public get length(): number { return this._data.length; }
 
+  public static async create(facts: IFact[]) {
+    return new Promise<FactList>(resolve => {
+      resolve(new FactList(facts));
+    })
+  }
 
-  constructor(facts?: IFact[]) {
+
+  private constructor(facts?: IFact[]) {
     if (facts) {
       this._data = facts;
       for (let i = 0; i < facts.length; i++) {

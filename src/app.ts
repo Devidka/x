@@ -50,16 +50,20 @@ new SearchAction({
   }
 }).on('select', function () {
   this.text = '';
-}).on('accept', function (widget, query) {
-  search(query);
+}).on('accept', (event) => {
+  search(event.query);
 }).appendTo(navigationView);
 
-function search(value) {
+async function search(value) {
   let kanji = findKanji(dictionary.kanji, getKanji(value));
-  new FactListPage({facts: new FactList(kanji)}).appendTo(navigationView);
+  new FactListPage({ facts: await FactList.create(kanji) }).appendTo(navigationView);
 }
 
-fetch('../KanjiDamage.json').then(response => response.json().then(json => dictionary = json).then(() => {
-  new FactListPage({facts: new FactList(dictionary.kanji)}).appendTo(navigationView);
-}));
+loadDictionary().then(async () => new FactListPage({ facts: await FactList.create(dictionary.kanji) }).appendTo(navigationView));
+
+function loadDictionary() {
+  return fetch('../KanjiDamage.json')
+    .then(response => response.json()
+      .then(json => dictionary = json));
+}
 

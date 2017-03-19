@@ -8,7 +8,7 @@
     "start": "tabris serve"
   },
     "dependencies": {
-    "tabris": "^2.0.0-beta1"
+    "tabris": "https://tabrisjs.com/downloads/nightly-2.x/tabris.tgz"
   },
   "devDependencies": {
     "typescript": "^2.2.1"

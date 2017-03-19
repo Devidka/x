@@ -30,7 +30,7 @@ export default class ExpandCollectionWindow extends FloatingWindow {
     let usefulnessComposite = new Composite({ left: buttonsComposite });
     new TextView({ class: 'smallLabel', text: 'limit usefulness', left: 10, top: 10, right: 10 }).appendTo(usefulnessComposite);
     for (let i = 0; i < 6; i++) {
-      new RadioButton({ class: 'usefulness', centerX: 0, width: 100, top: 'prev()', selection: i == 0, text: getUsefulnessStars(i) })
+      new RadioButton({ class: 'usefulness', centerX: 0, width: 100, top: 'prev()', checked: i == 0, text: getUsefulnessStars(i) })
         .on("select", () => this.minUsefulness = i)
         .appendTo(usefulnessComposite);
     }

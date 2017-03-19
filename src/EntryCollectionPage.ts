@@ -48,15 +48,15 @@ export default class EntryCollectionPage extends Page {
       new TextView({ class: 'usefulness', centerY: 0, right: 5 }),
       new Composite({ left: 0, right: 0, bottom: 0, height: 1, background: '#bbb' })
     )
-    cell.on('change:item', function (widget, entry) {
-      let kanjiText = entry.kanji;
-      if (entry.okurigana) {
-        kanjiText = entry.okurigana.pre + kanjiText + entry.okurigana.post;
+    cell.on('change:item', (event) => {
+      let kanjiText = event.entry.kanji;
+      if (event.entry.okurigana) {
+        kanjiText = event.entry.okurigana.pre + kanjiText + event.entry.okurigana.post;
       }
       cell.apply({
-        '.kanjiText': { text: kanjiText, font: fonts['entryCollection_' + getType(entry)] },
-        '.meaningText': { text: entry.meaning },
-        '.usefulness': { text: getUsefulnessStars(entry.usefulness) }
+        '.kanjiText': { text: kanjiText, font: fonts['entryCollection_' + getType(event.entry)] },
+        '.meaningText': { text: event.entry.meaning },
+        '.usefulness': { text: getUsefulnessStars(event.entry.usefulness) }
       });
       // if (getType(entry) === 'jukugo') {
       //   let kanjiTextView = cell.find('.kanjiText').first();

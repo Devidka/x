@@ -6,18 +6,18 @@ import { applyColors, applyFonts, fonts } from "./resources";
 import { navigationView } from "./app";
 import FactList from "./FactList";
 
-interface FactListPageProperties extends PageProperties {
-  facts: FactList;
-}
-
 export default class FactListPage extends Page {
 
   private entryCollectionView: CollectionView;
   public facts: FactList;
 
-  constructor(properties: FactListPageProperties) {
-    super(properties);
-    this.facts = properties.facts;
+  constructor(facts: (FactList | Promise<FactList>)) {
+    super();
+    this.init(facts);
+  }
+
+  private async init(facts: (FactList | Promise<FactList>)) {
+    this.facts = facts instanceof FactList ? facts : await facts;
     this.entryCollectionView = new CollectionView({
       left: 0, top: 0, right: 0, bottom: 0,
       items: this.facts.asArray(),
@@ -26,16 +26,18 @@ export default class FactListPage extends Page {
     }).on('select', this.handleSelectCell.bind(this)).appendTo(this);
     this.on('appear', () => {
       navigationView.apply({
-        '#expandAction' : {visible: true},
-        '#filterAction' : {visible: true}
+        '#expandAction': { visible: true },
+        '#filterAction': { visible: true }
       });
     });
     this.on('disappear', () => {
       navigationView.apply({
-        '#expandAction' : {visible: false},
-        '#filterAction' : {visible: false}
+        '#expandAction': { visible: false },
+        '#filterAction': { visible: false }
       });
     });
+
+
   }
 
   private initializeCell(cell: Cell) {

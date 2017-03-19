@@ -22,8 +22,7 @@ export default class ExpandCollectionWindow extends FloatingWindow {
         .on('select', () => {
           this.dispose();
           let currentPage = navigationView.pages().last() as FactListPage;
-          let newData = currentPage.facts.addJukugo(this.minUsefulness);
-          new FactListPage({title: 'expanded collection', facts: newData}).appendTo(navigationView);
+          new FactListPage(currentPage.facts.addJukugo(this.minUsefulness), "expand results").appendTo(navigationView);
         })
         .appendTo(buttonsComposite)
     )

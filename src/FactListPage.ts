@@ -1,5 +1,5 @@
 import { IKanji, IJukugo, IFact } from './Interfaces';
-import { CollectionView, Composite, Cell, TextView, ImageView, device, ui, Page, PageProperties } from 'tabris';
+import { CollectionView, Composite, Cell, TextView, ImageView, device, ui, Page, PageProperties, ActivityIndicator } from 'tabris';
 import KanjiPage from './Kanjipage';
 import { getUsefulnessStars, getType } from "./util";
 import { applyColors, applyFonts, fonts } from "./resources";
@@ -11,13 +11,9 @@ export default class FactListPage extends Page {
   private entryCollectionView: CollectionView;
   public facts: FactList;
 
-  constructor(facts: (FactList | Promise<FactList>)) {
-    super();
-    this.init(facts);
-  }
-
-  private async init(facts: (FactList | Promise<FactList>)) {
-    this.facts = facts instanceof FactList ? facts : await facts;
+  constructor(facts: FactList, title?: string) {
+    super({ title });
+    this.facts = facts;
     this.entryCollectionView = new CollectionView({
       left: 0, top: 0, right: 0, bottom: 0,
       items: this.facts.asArray(),
@@ -36,8 +32,6 @@ export default class FactListPage extends Page {
         '#filterAction': { visible: false }
       });
     });
-
-
   }
 
   private initializeCell(cell: Cell) {
@@ -57,10 +51,6 @@ export default class FactListPage extends Page {
         '.meaningText': { text: event.value.meaning },
         '.usefulness': { text: getUsefulnessStars(event.value.usefulness) }
       });
-      // if (getType(entry) === 'jukugo') {
-      //   let kanjiTextView = cell.find('.kanjiText').first();
-      //   cell.find('.meaningText').first().baseline = kanjiTextView;
-      // }
       applyColors(cell);
       applyFonts(cell);
     });

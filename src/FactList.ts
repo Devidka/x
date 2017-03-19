@@ -6,14 +6,7 @@ export default class FactList {
   private _data: IFact[];
   public get length(): number { return this._data.length; }
 
-  public static async create(facts: IFact[]) {
-    return new Promise<FactList>(resolve => {
-      resolve(new FactList(facts));
-    })
-  }
-
-
-  private constructor(facts?: IFact[]) {
+  constructor(facts?: IFact[]) {
     if (facts) {
       this._data = facts;
       for (let i = 0; i < facts.length; i++) {
@@ -33,21 +26,19 @@ export default class FactList {
   }
 
   public push(fact: IFact) {
-    console.log('push ' + fact.id);
     this[fact.id] = this.length;
     this._data.push(fact);
     return this.length;
   }
 
-  public addJukugo(minUsefulness: number): FactList {
+  public addJukugo(minUsefulness: number) {
     let newFactList = new FactList();
-    let addedJukugo: number[] = [];
     this._data.forEach(entry => {
       newFactList.push(entry);
       if (getType(entry) === 'kanji') {
         (entry as IKanji).jukugo.forEach(jukugoIndex => {
           let jukugo = dictionary.jukugo[jukugoIndex];
-          if (jukugo.usefulness >= minUsefulness && !this.contains(jukugo ) && !newFactList.contains(jukugo)) {
+          if (jukugo.usefulness >= minUsefulness && !this.contains(jukugo) && !newFactList.contains(jukugo)) {
             newFactList.push(jukugo);
           }
         })
@@ -57,7 +48,6 @@ export default class FactList {
   }
 
   public contains(fact: IFact) {
-    console.log('fact id ' + fact.id + ' index ' + this[fact.id]);
     return !!this[fact.id];
   }
 }

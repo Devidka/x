@@ -1,0 +1,9 @@
+{
+  "maxKanjiTags": 5,
+  "maxJukugo": 11,
+  "maxKunyomi": 5,
+  "maxKanjiComponents": 5,
+  "maxJukugoTags": 3,
+  "maxKunTags": 2,
+  "maxJukugoComponents": 5
+}

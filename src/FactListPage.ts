@@ -58,15 +58,12 @@ export default class FactListPage extends Page {
 
   private handleSelectCell(event) {
     let entryNum = event.index;
-    let openNextPage = (event?: { target: Page, offset: number }) => {
-      if (event) {
-        event.target.dispose();
-        entryNum = (entryNum + event.offset) % this.facts.length;
-        entryNum = (entryNum < 0) ? this.facts.length + entryNum : entryNum;
-      }
-      new KanjiPage(this.facts.get(entryNum) as IKanji, (entryNum + 1) + '/' + this.facts.length).on('navigate', openNextPage).appendTo(navigationView);
-    };
-    openNextPage();
-  }
-
+    new KanjiPage(this.facts.get(entryNum) as IKanji, (entryNum + 1) + '/' + this.facts.length).on('navigate', event => {
+      entryNum = (entryNum + event.offset) % this.facts.length;
+      entryNum = (entryNum < 0) ? this.facts.length + entryNum : entryNum;
+      event.target.applyData(this.facts.get(entryNum));
+    }).appendTo(navigationView);
+  };
 }
+
+

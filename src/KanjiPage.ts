@@ -1,4 +1,4 @@
-import { Page, TextView, ScrollView, ImageView, Composite, Widget } from 'tabris';
+import { Page, TextView, ScrollView, ImageView, Composite, Widget, CompositeProperties } from 'tabris';
 import { IKanji, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
 import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag, createKanjiWithFurigana } from './util';
 import { applyColors, applyFonts } from './resources';
@@ -13,7 +13,8 @@ const MAX_JUKUGO = 10;
 
 export default class KanjiPage extends Page {
   private kanji: string;
-  private header: Composite;
+  private header: Header;
+  private kunyomiDisplays: KunyomiDisplay[];
   private jukugos: Composite[];
   private usefulness: TextView;
   private strokeCount: TextView;
@@ -26,20 +27,20 @@ export default class KanjiPage extends Page {
 
   constructor(data: IKanji, title?: string) {
     super();
-    this.jukugos = [];
-    this.kanji = data.kanji;
     this.title = title + '  ' + data.kanji;
+    this.kanji = data.kanji;
     let scrollView = new ScrollView({ left: 0, top: 0, right: 0, bottom: 0 }).appendTo(this);
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
-    this.header = this.createHeader().appendTo(scrollView);
-    new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(header);    
-
-    //for (let i = 0; i < MAX_KUNYOMI; i++) {
-    //this.createKunyomiDisplay(i).appendTo(scrollView);      
-    //new Composite({ class: 'seperator', height: 1, background: '#ddd', visible:  }).appendTo(scrollView);
-    //}
-    new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ', visible: (data.jukugo && data.jukugo.length > 0) }).appendTo(scrollView);
+    this.header = new Header({ class: 'header' }).appendTo(scrollView);
+    new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(this);
+    this.kunyomiDisplays = [];
+    for (let i = 0; i < MAX_KUNYOMI; i++) {
+      this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).appendTo(scrollView));
+      new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).appendTo(scrollView);
+    }
+    new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView);
+    this.jukugos = [];
     for (let i = 0; i < MAX_JUKUGO; i++) {
       this.jukugos[i] = this.createJukugoDisplay().appendTo(scrollView);
       //new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView);
@@ -60,16 +61,7 @@ export default class KanjiPage extends Page {
   }
 
   public applyData(data: IKanji) {
-    this.header.apply({
-      '.usefulness': { text: getUsefulnessStars(data.usefulness) },
-      '.strokeCount': { text: data.strokeCount + ' strokes' },
-      '#meaning': { text: data.meaning },
-      '.mainKanji': { text: data.kanji},
-      '.number': { text: 'number ' + data.number },
-      '.onyomi': { text: getOnyomi(data) },
-      '.mnemonic': { text: data.mnemonic },
-      '#kunLabel': { visible: (data.kunyomi && data.kunyomi.length > 0) }
-    });
+    this.header.applyData(data);
     for (let i = 0; i < data.jukugo.length; i++) {
       let jukugo = dictionary.jukugo[data.jukugo[i]];
       this.jukugos[i].apply({
@@ -86,23 +78,6 @@ export default class KanjiPage extends Page {
 
     }
 
-  }
-
-  private createHeader() {
-    let header = new Composite();
-    new TextView({ class: 'mainKanji', font: MAIN_KANJI_SIZE + 'px' }).appendTo(header);    
-    //this.createComponentsDisplay(data.components).set("id", "components");
-    new TextView({ class: 'usefulness', id: 'usefulness' }).appendTo(header);
-    new TextView({ class: 'strokeCount' }).appendTo(header);
-    new TextView({ id: 'meaning' }).appendTo(header);
-    new TextView({ class: 'number' }).appendTo(header);
-    new TextView({ class: 'label', id: 'onLabel', text: 'On: ' }).appendTo(header);
-    new TextView({ class: 'onyomi' }).appendTo(header);
-    new TextView({ class: 'mnemonic', markupEnabled: true }).appendTo(header);
-    header.apply({
-
-    })
-    return header;
   }
 
   createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[], maxColumns?: number) {
@@ -207,6 +182,51 @@ export default class KanjiPage extends Page {
 
   applyLayout() {
     this.apply({
+      '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
+      '.kunyomi': { top: ['prev(components: ComponentsDisplay;)', 0], left: 0, right: 20 },
+      '#jukugoLabel': { left: 10, top: ['prev()', 5] },
+      '.jukugo': { top: ['prev()', 0], left: 0, right: 20 },
+      '.seperator': { top: ['prev()', 3], left: 20, right: 20 }
+    });
+  }
+
+}
+
+class Header extends Composite {
+
+  private componentsDisplay: ComponentsDisplay;
+
+  constructor(properties?: CompositeProperties) {
+    super(properties || {});
+    new TextView({ class: 'mainKanji', font: MAIN_KANJI_SIZE + 'px' }).appendTo(this);
+    this.componentsDisplay = new ComponentsDisplay({ class: "components" }).appendTo(this);
+    new TextView({ class: 'usefulness', id: 'usefulness' }).appendTo(this);
+    new TextView({ class: 'strokeCount' }).appendTo(this);
+    new TextView({ id: 'meaning' }).appendTo(this);
+    new TextView({ class: 'number' }).appendTo(this);
+    new TextView({ class: 'label', id: 'onLabel', text: 'On: ' }).appendTo(this);
+    new TextView({ class: 'onyomi' }).appendTo(this);
+    new TextView({ class: 'mnemonic', markupEnabled: true }).appendTo(this);
+    this.applyLayout();
+  }
+
+  public applyData(data: IKanji): this {
+    this.componentsDisplay.applyData(data.components);
+    this.apply({
+      '.usefulness': { text: getUsefulnessStars(data.usefulness) },
+      '.strokeCount': { text: data.strokeCount + ' strokes' },
+      '#meaning': { text: data.meaning },
+      '.mainKanji': { text: data.kanji },
+      '.number': { text: 'number ' + data.number },
+      '.onyomi': { text: getOnyomi(data) },
+      '.mnemonic': { text: data.mnemonic },
+      '#kunLabel': { visible: (data.kunyomi && data.kunyomi.length > 0) }
+    });
+    return this;
+  }
+
+  private applyLayout() {
+    this.apply({
       '.number': { centerX: 0, top: 5 },
       '#usefulness': { left: 10, top: 8 },
       '.strokeCount': { right: 10, top: 10 },
@@ -216,12 +236,45 @@ export default class KanjiPage extends Page {
       '#onLabel': { left: ['.mainKanji', 10], top: ['#meaning', 0] },
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: '.tag' },
       '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
-      '#kunLabel': { left: 10, top: ['.mnemonic', 5] },
-      '.kunyomi': { top: ['prev()', 0], left: 0, right: 20 },
-      '#jukugoLabel': { left: 10, top: ['prev()', 5] },
-      '.jukugo': { top: ['prev()', 0], left: 0, right: 20 },
-      '.seperator': { top: ['prev()', 3], left: 20, right: 20 }
-    });
+    })
+  }
+}
+
+class ComponentsDisplay extends Composite {
+
+  constructor(properties?: CompositeProperties) {
+    super(properties || {});
   }
 
+  public applyData(components: { kanji: string, meaning: string }[]) : this{
+    throw "not implemented";
+  }
+}
+
+class KunyomiDisplay extends Composite {
+
+  public applyData(data: any): this {
+    throw "not implemented";
+  }
+}
+
+class jukugoDisplay extends Composite {
+
+  public applyData(data: any): this {
+    throw "not implemented";
+  }
+}
+
+class LookalikeDisplay extends Composite {
+
+  public applyData(data: any): this {
+    throw "not implemented";
+  }
+}
+
+class UsedInDisplay extends Composite {
+
+  public applyData(data: any): this {
+    throw "not implemented";
+  }
 }

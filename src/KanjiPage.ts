@@ -15,6 +15,7 @@ export default class KanjiPage extends Page {
   private kanji: string;
   private header: Header;
   private kunyomiDisplays: KunyomiDisplay[];
+  private kunSeparators: Composite[];
   private jukugos: Composite[];
   private usefulness: TextView;
   private strokeCount: TextView;
@@ -33,12 +34,13 @@ export default class KanjiPage extends Page {
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
     this.header = new Header({ id: 'header' }).appendTo(scrollView);
-    new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView);
+    kunLabel = new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView);
     this.kunyomiDisplays = [];
-    for (let i = 0; i < MAX_KUNYOMI; i++) {
-      this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).appendTo(scrollView));
-      new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).appendTo(scrollView);
-    }
+    this.kunSeparators = [];
+    // for (let i = 0; i < MAX_KUNYOMI; i++) {
+    //   this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).appendTo(scrollView));
+    //   new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).appendTo(scrollView);
+    // }
     new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView);
     // this.jukugos = [];
     // for (let i = 0; i < MAX_JUKUGO; i++) {
@@ -60,9 +62,15 @@ export default class KanjiPage extends Page {
     this.applyLayout();
   }
 
-  public applyData(data: IKanji) {
-    console.log(JSON.stringify(data));
-    this.header.applyData(data);
+  public applyData(data: IKanji) {    
+    this.header.applyData(data);  
+    for (let i = this.kunyomiDisplays.length; i < data.kunyomi.length; i++) {
+      this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(kunLabel);
+    }
+    for (let i = data.kunyomi.length; i < this.kunyomiDisplays.length; i++) {
+      this.kunyomiDisplays[i].dispose();
+      this.kunyomiDisplays[i] = null;
+    }
     for (let i = 0; i < MAX_KUNYOMI; i++) {
       this.kunyomiDisplays[i].applyData(data.kunyomi[i]);
       this.find('#kunSeperator' + i).first().background = i >= data.kunyomi.length - 1 ? '#ddd' : '#000';

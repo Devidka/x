@@ -23,7 +23,7 @@ export function createKanji(data: { kanji: string, kanjiImageSource?: string }, 
 }
 
 export function createKanjiWithFurigana(kanji: string, furigana: string) {
-  let kanjiBox = new Composite();
+  let kanjiBox = new Composite({class: 'kanjiBox'});
   new TextView({ class: 'furigana', text: furigana })
     .set({ top: 2, centerX: 0 })
     .appendTo(kanjiBox);

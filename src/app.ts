@@ -64,6 +64,10 @@ loadDictionary().then(async () => new FactListPage(new FactList(dictionary.kanji
 function loadDictionary() {
   return fetch('../KanjiDamage.json')
     .then(response => response.json()
-      .then(json => dictionary = json));
+      .then(json => {
+        dictionary = json;
+        console.log('asdf: ' + dictionary.kanji[6].kunyomi[0].meaning);
+
+      }));
 }
 

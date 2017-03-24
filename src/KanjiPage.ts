@@ -34,7 +34,7 @@ export default class KanjiPage extends Page {
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
     this.header = new Header({ id: 'header' }).appendTo(scrollView);
-    kunLabel = new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView);
+    this.kunLabel = new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView);
     this.kunyomiDisplays = [];
     this.kunSeparators = [];
     // for (let i = 0; i < MAX_KUNYOMI; i++) {
@@ -62,18 +62,22 @@ export default class KanjiPage extends Page {
     this.applyLayout();
   }
 
-  public applyData(data: IKanji) {    
-    this.header.applyData(data);  
+  public applyData(data: IKanji) {
+    this.header.applyData(data);
     for (let i = this.kunyomiDisplays.length; i < data.kunyomi.length; i++) {
-      this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(kunLabel);
+      this.kunyomiDisplays[i] = new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(this.kunLabel);
+      this.kunSeparators[i] = new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' })
+      .insertAfter(this.kunyomiDisplays[i]);
     }
     for (let i = data.kunyomi.length; i < this.kunyomiDisplays.length; i++) {
       this.kunyomiDisplays[i].dispose();
       this.kunyomiDisplays[i] = null;
+      this.kunSeparators[i].dispose();
+      this.kunSeparators[i] = null;
+
     }
-    for (let i = 0; i < MAX_KUNYOMI; i++) {
+    for (let i = 0; i < data.kunyomi.length; i++) {
       this.kunyomiDisplays[i].applyData(data.kunyomi[i]);
-      this.find('#kunSeperator' + i).first().background = i >= data.kunyomi.length - 1 ? '#ddd' : '#000';
     }
     // for (let i = 0; i < data.jukugo.length; i++) {
     //   let jukugo = dictionary.jukugo[data.jukugo[i]];
@@ -224,7 +228,6 @@ class ComponentsDisplay extends Composite {
 class KunyomiDisplay extends Composite {
 
   constructor(properties?: CompositeProperties) {
-    properties.background = '#222';
     super(properties || {});
     let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(this);
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0 }).appendTo(this);
@@ -262,12 +265,12 @@ class KunyomiDisplay extends Composite {
   private applyLayout() {
     let stars = this.find().first() as TextView;
     this.apply({
-      '.usefulness': { top: 20, left: 0 },
-      '#postParticle': { right: 5, top: '.usefulness' },
-      '#okurigana': { right: ['prev()', 5], top: '.usefulness' },
-      '.kanjiBox': { right: ['prev()', 5], top: 15 },
+      '.usefulness': { right: 0, top: 0 },
+      '#postParticle': { right: 0, top: '.usefulness' },
+      '#okurigana': { right: ['prev()', 5], top: 15 },
+      '.kanjiBox': { right: ['prev()', 5], top: '.usefulness' },
       '#preParticle': { right: 'prev()', top: '.usefulness' },
-      '.meaning': { top: 20, left: 0 }
+      '.meaning': { top: 0, left: 0, right: 0 }
     });
 
   }

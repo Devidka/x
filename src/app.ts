@@ -66,7 +66,7 @@ function loadDictionary() {
     .then(response => response.json()
       .then(json => {
         dictionary = json;
-        console.log('asdf: ' + dictionary.kanji[6].kunyomi[0].meaning);
+        console.log('asdf: ' + dictionary.kanji[6].kunyomi[0].kanji);
 
       }));
 }

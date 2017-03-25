@@ -67,12 +67,10 @@ export function findKanji(collection: IKanji[], kanji: string[]) {
   return collection.filter((entry => kanji.indexOf(entry.kanji) != -1));
 }
 
-export function getType(object: Object) {
-  if (object.hasOwnProperty("strokeCount")) return "kanji";
-  if (object.hasOwnProperty("reading")) {
-    if (object.hasOwnProperty("components")) return "jukugo";
-    else return "kunyomi";
-  }
+export function getType(object: IFact) {
+  if (object.id.slice(0, 1) == 'k') return "kanji";
+  if (object.id.slice(0, 1) == 'j') return "jukugo";
+  if (object.id.slice(0, 3) == 'kun') return "kunyomi";
   return "undefined";
 }
 

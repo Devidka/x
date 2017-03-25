@@ -1,6 +1,6 @@
 import { Page, TextView, ScrollView, ImageView, Composite, Widget, CompositeProperties } from 'tabris';
-import { IKanji, IJukugo, IKunyomi, ILookalikeSet } from './interfaces';
-import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag, createKanjiWithFurigana } from './util';
+import { IKanji, IJukugo, IKunyomi, IWord, ILookalikeSet } from './interfaces';
+import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag, createKanjiWithFurigana, getType } from './util';
 import { applyColors, applyFonts } from './resources';
 import { dictionary } from "./app";
 
@@ -12,19 +12,16 @@ const MAX_KUNYOMI = 10;
 const MAX_JUKUGO = 10;
 
 export default class KanjiPage extends Page {
-  private kanji: string;
   private header: Header;
-  private kunyomiDisplays: KunyomiDisplay[];
+  private kunyomiDisplays: WordDisplay[];
   private kunSeparators: Composite[];
-  private jukugos: Composite[];
-  private usefulness: TextView;
-  private strokeCount: TextView;
-  private meaning: TextView;
-  private number: TextView;
+  private jukugoDisplays: WordDisplay[];
+  private jukSeparators: Composite[];
   private onLabel: TextView;
   private onyomi: TextView;
   private mnemonic: TextView;
   private kunLabel: TextView;
+  private jukugoLabel: TextView;
 
   constructor(data: IKanji, title?: string) {
     super();
@@ -34,14 +31,21 @@ export default class KanjiPage extends Page {
     scrollView.on('swipe:left', () => this.trigger('navigate', { target: this, offset: 1 }));
     scrollView.on('swipe:right', () => this.trigger('navigate', { target: this, offset: -1 }));
     this.header = new Header({ id: 'header' }).appendTo(scrollView);
+    this.mnemonic = new TextView({ class: 'mnemonic', markupEnabled: true }).appendTo(scrollView);
     this.kunLabel = new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(scrollView);
     this.kunyomiDisplays = [];
     this.kunSeparators = [];
-    // for (let i = 0; i < MAX_KUNYOMI; i++) {
-    //   this.kunyomiDisplays.push(new KunyomiDisplay({ class: 'kunDisplay' }).appendTo(scrollView));
-    //   new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).appendTo(scrollView);
-    // }
-    new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView);
+     for (let i = 0; i < MAX_KUNYOMI; i++) {
+       this.kunyomiDisplays.push(new WordDisplay({ class: 'kunDisplay' }).appendTo(scrollView));
+       this.kunSeparators.push(new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView));
+    }
+    this.jukugoLabel = new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(scrollView);
+    this.jukugoDisplays = [];
+    this.jukSeparators = [];
+     for (let i = 0; i < MAX_JUKUGO; i++) {
+       this.jukugoDisplays.push(new WordDisplay({ class: 'jukugoDisplay' }).appendTo(scrollView));
+       this.jukSeparators.push(new Composite({ class: 'seperator', height: 1, background: '#ddd' }).appendTo(scrollView));
+    }
     // this.jukugos = [];
     // for (let i = 0; i < MAX_JUKUGO; i++) {
     //   this.jukugos[i] = this.createJukugoDisplay().appendTo(scrollView);
@@ -55,31 +59,49 @@ export default class KanjiPage extends Page {
     //   this.createLookalikeDisplay(set);
     // });
     // this.createUsedInDisplay(data.usedIn);
-    this.applyData(data);
+    this.applyLayout();
 
     applyColors(this);
     applyFonts(this);
-    this.applyLayout();
+    this.applyData(data);
   }
 
   public applyData(data: IKanji) {
     this.header.applyData(data);
+    this.mnemonic.text = data.mnemonic;
     for (let i = 0; i < MAX_KUNYOMI; i++) {
       if (i < data.kunyomi.length) {
-        this.kunyomiDisplays[i] = this.kunyomiDisplays[i] || new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(this.kunLabel);
-        this.kunSeparators[i] = this.kunSeparators[i] || new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).insertAfter(this.kunyomiDisplays[i]);
+        if (!this.kunyomiDisplays[i].parent()) {
+          this.kunyomiDisplays[i].insertAfter(this.kunLabel);
+          this.kunSeparators[i].insertAfter(this.kunyomiDisplays[i]);
+        }
         this.kunyomiDisplays[i].applyData(data.kunyomi[i]);
       }
       if (i >= data.kunyomi.length) {
-        if (this.kunyomiDisplays[i]) this.kunyomiDisplays[i].dispose();
-        if (this.kunSeparators[i]) this.kunSeparators[i].dispose();
-        this.kunyomiDisplays[i] = null;
-        this.kunSeparators[i] = null;
+        if (this.kunyomiDisplays[i].parent()) {
+          this.kunyomiDisplays[i].detach();
+          this.kunSeparators[i].detach();
+        }
       }
     }
-    this.applyLayout();
-    applyColors(this);
-    applyFonts(this);
+    for (let i = 0; i < MAX_JUKUGO; i++) {
+      if (i < data.jukugo.length) {
+        if (!this.jukugoDisplays[i].parent()) {
+          this.jukugoDisplays[i].insertAfter(this.jukugoLabel);
+          this.jukSeparators[i].insertAfter(this.jukugoDisplays[i]);
+        }
+        this.jukugoDisplays[i].applyData(dictionary.jukugo[i]);
+      }
+      if (i >= data.jukugo.length) {
+        if (this.jukugoDisplays[i].parent()) {
+          this.jukugoDisplays[i].detach();
+          this.jukSeparators[i].detach();
+        }
+      }
+    }
+    //this.applyLayout();
+    //applyColors(this);
+    //applyFonts(this);
     // for (let i = 0; i < data.jukugo.length; i++) {
     //   let jukugo = dictionary.jukugo[data.jukugo[i]];
     //   this.jukugos[i].apply({
@@ -154,11 +176,11 @@ export default class KanjiPage extends Page {
   applyLayout() {
     this.apply({
       '.header': { left: 0, top: 0, right: 0 },
+      '.mnemonic': { left: 0, top: 'prev()', right: 0 },
       '#kunLabel': { left: 10, top: ['prev()', 5] },
       '.kunDisplay': { top: 'prev()', left: 0, right: 20 },
-      '.kunSeperator': { top: 'prev()', left: 0, right: 20 },
       '#jukugoLabel': { left: 10, top: ['prev()', 5] },
-      '.jukugo': { top: ['prev()', 0], left: 0, right: 20 },
+      '.jukugoDisplay': { top: 'prev()', left: 0, right: 20 },
       '.seperator': { top: ['prev()', 3], left: 20, right: 20 }
     });
   }
@@ -170,6 +192,7 @@ class Header extends Composite {
   private componentsDisplay: ComponentsDisplay;
 
   constructor(properties?: CompositeProperties) {
+    properties.background = 'rgba(255,0,0,0.1)';
     super(properties || {});
     new TextView({ class: 'mainKanji', font: MAIN_KANJI_SIZE + 'px' }).appendTo(this);
     this.componentsDisplay = new ComponentsDisplay({ class: "components" }).appendTo(this);
@@ -179,7 +202,6 @@ class Header extends Composite {
     new TextView({ class: 'number' }).appendTo(this);
     new TextView({ class: 'label', id: 'onLabel', text: 'On: ' }).appendTo(this);
     new TextView({ class: 'onyomi' }).appendTo(this);
-    new TextView({ class: 'mnemonic', markupEnabled: true }).appendTo(this);
     this.applyLayout();
   }
 
@@ -192,7 +214,6 @@ class Header extends Composite {
       '.mainKanji': { text: data.kanji },
       '.number': { text: 'number ' + data.number },
       '.onyomi': { text: getOnyomi(data) },
-      '.mnemonic': { text: data.mnemonic },
       '#kunLabel': { visible: (data.kunyomi && data.kunyomi.length > 0) }
     });
     return this;
@@ -208,7 +229,6 @@ class Header extends Composite {
       '#meaning': { left: ['.mainKanji', 10], top: 38, right: 100 },
       '#onLabel': { left: ['.mainKanji', 10], top: ['#meaning', 0] },
       '.onyomi': { left: ['#onLabel', 0], baseline: '#onLabel', right: '.tag' },
-      '.mnemonic': { top: ['.components', 5], left: 20, right: 20 },
     })
   }
 }
@@ -226,37 +246,45 @@ class ComponentsDisplay extends Composite {
   }
 }
 
-class KunyomiDisplay extends Composite {
+class WordDisplay extends Composite {
 
   constructor(properties?: CompositeProperties) {
     super(properties || {});
     let rightSide = new Composite({ left: COLUMN_WIDTH, top: 0, bottom: 0, right: 0 }).appendTo(this);
     let leftSide = new Composite({ left: 0, right: [rightSide, 8], top: 0 }).appendTo(this);
     leftSide.append(
+      // todo: Components
       new TextView({ class: 'usefulness' }),
       new TextView({ class: 'particle', id: 'postParticle' }),
-      new TextView({ class: 'kana', id: 'okurigana' }),
+      new TextView({ class: 'kana', id: 'postOkurigana' }),
       createKanjiWithFurigana('', ''),
+      new TextView({ class: 'kana', id: 'preOkurigana' }),
       new TextView({ class: 'particle', id: 'preParticle' })
     );
     rightSide.append(
-      new TextView({ class: 'meaning' })
+      new TextView({ class: 'meaning' }),
+      new TextView({ class: 'description' })
     );
     this.applyLayout();
   }
 
-  public applyData(data: IKunyomi): this {
+  public applyData(data: IWord): this {
+    // todo: add componentsDisplay
     if (data) {
       console.log(data);
       this.visible = true;
+      let preOkurigana = (getType(data) === 'jukugo') ? (data as IJukugo).okurigana.pre : '';
+      let postOkurigana = (getType(data) === 'jukugo') ? (data as IJukugo).okurigana.post : (data as IKunyomi).okurigana;
       this.apply({
         '.usefulness': { text: getUsefulnessStars(data.usefulness) || '' },
-        '.meaning': { text: data.description || '' },
         '#postParticle': { text: data.postParticle || '' },
-        '#okurigana': { text: data.okurigana || '' },
+        '#postOkurigana': { text: postOkurigana || '' },
         '.kanji': { text: data.kanji || '' },
         '.furigana': { text: data.reading || '' },
-        '#preParticle': { text: data.preParticle || '' }
+        '#preOkurigana': { text: preOkurigana || '' },
+        '#preParticle': { text: data.preParticle || '' },
+        '.meaning': { text: data.meaning || '' },
+        '.description': { text: data.description || '' },
       });
     } else {
       this.visible = false;
@@ -268,11 +296,13 @@ class KunyomiDisplay extends Composite {
     let stars = this.find().first() as TextView;
     this.apply({
       '.usefulness': { right: 0, top: 0 },
-      '#postParticle': { right: 0, top: ['.usefulness', 8] },
-      '#okurigana': { right: ['prev()', 0], top: ['.usefulness', 8] },
+      '#postParticle': { right: 0, top: ['.usefulness', 9] },
+      '#postOkurigana': { right: ['prev()', 0], top: ['.usefulness', 8] },
       '.kanjiBox': { right: ['prev()', 0], top: 15 },
+      '#preOkurigana': { right: ['prev()', 0], top: ['.usefulness', 8] },
       '#preParticle': { right: ['prev()', 2], top: ['.usefulness', 9] },
-      '.meaning': { top: 15, left: 0, right: 0 }
+      '.meaning': { top: 20, left: 0, right: 0 }
+      '.description': { top: ['prev()', 5], left: 0, right: 0 }
     });
 
   }

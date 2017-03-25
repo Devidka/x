@@ -64,21 +64,22 @@ export default class KanjiPage extends Page {
 
   public applyData(data: IKanji) {
     this.header.applyData(data);
-    for (let i = this.kunyomiDisplays.length; i < data.kunyomi.length; i++) {
-      this.kunyomiDisplays[i] = new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(this.kunLabel);
-      this.kunSeparators[i] = new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' })
-      .insertAfter(this.kunyomiDisplays[i]);
+    for (let i = 0; i < MAX_KUNYOMI; i++) {
+      if (i < data.kunyomi.length) {
+        this.kunyomiDisplays[i] = this.kunyomiDisplays[i] || new KunyomiDisplay({ class: 'kunDisplay' }).insertAfter(this.kunLabel);
+        this.kunSeparators[i] = this.kunSeparators[i] || new Composite({ class: 'seperator', id: 'kunSeperator' + i, height: 1, background: '#ddd' }).insertAfter(this.kunyomiDisplays[i]);
+        this.kunyomiDisplays[i].applyData(data.kunyomi[i]);
+      }
+      if (i >= data.kunyomi.length) {
+        if (this.kunyomiDisplays[i]) this.kunyomiDisplays[i].dispose();
+        if (this.kunSeparators[i]) this.kunSeparators[i].dispose();
+        this.kunyomiDisplays[i] = null;
+        this.kunSeparators[i] = null;
+      }
     }
-    for (let i = data.kunyomi.length; i < this.kunyomiDisplays.length; i++) {
-      this.kunyomiDisplays[i].dispose();
-      this.kunyomiDisplays[i] = null;
-      this.kunSeparators[i].dispose();
-      this.kunSeparators[i] = null;
-
-    }
-    for (let i = 0; i < data.kunyomi.length; i++) {
-      this.kunyomiDisplays[i].applyData(data.kunyomi[i]);
-    }
+    this.applyLayout();
+    applyColors(this);
+    applyFonts(this);
     // for (let i = 0; i < data.jukugo.length; i++) {
     //   let jukugo = dictionary.jukugo[data.jukugo[i]];
     //   this.jukugos[i].apply({
@@ -246,15 +247,16 @@ class KunyomiDisplay extends Composite {
 
   public applyData(data: IKunyomi): this {
     if (data) {
+      console.log(data);
       this.visible = true;
       this.apply({
-        '.usefulness': { text: getUsefulnessStars(data.usefulness), visible: data.usefulness !== null },
-        '.meaning': { text: data.description, visible: data.description !== null },
-        '#postParticle': { text: data.postParticle, visible: data.postParticle !== null },
-        '#okurigana': { text: data.okurigana, visible: data.okurigana !== null },
-        '.kanji': { text: data.kanji, visible: data.kanji !== null },
-        '.furigana': { text: data.reading, visible: data.reading !== null },
-        '#preParticle': { text: data.preParticle, visible: data.preParticle !== null }
+        '.usefulness': { text: getUsefulnessStars(data.usefulness) || '' },
+        '.meaning': { text: data.description || '' },
+        '#postParticle': { text: data.postParticle || '' },
+        '#okurigana': { text: data.okurigana || '' },
+        '.kanji': { text: data.kanji || '' },
+        '.furigana': { text: data.reading || '' },
+        '#preParticle': { text: data.preParticle || '' }
       });
     } else {
       this.visible = false;
@@ -266,11 +268,11 @@ class KunyomiDisplay extends Composite {
     let stars = this.find().first() as TextView;
     this.apply({
       '.usefulness': { right: 0, top: 0 },
-      '#postParticle': { right: 0, top: '.usefulness' },
-      '#okurigana': { right: ['prev()', 5], top: 15 },
-      '.kanjiBox': { right: ['prev()', 5], top: '.usefulness' },
-      '#preParticle': { right: 'prev()', top: '.usefulness' },
-      '.meaning': { top: 0, left: 0, right: 0 }
+      '#postParticle': { right: 0, top: ['.usefulness', 8] },
+      '#okurigana': { right: ['prev()', 0], top: ['.usefulness', 8] },
+      '.kanjiBox': { right: ['prev()', 0], top: 15 },
+      '#preParticle': { right: ['prev()', 2], top: ['.usefulness', 9] },
+      '.meaning': { top: 15, left: 0, right: 0 }
     });
 
   }

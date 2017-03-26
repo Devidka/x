@@ -28,12 +28,14 @@ export let fonts = {
   furigana: '10px',
   kanji: '20px',
   mainKanji: '80px',
+  mainComponent: '18px',
   entryCollection_kanji: '30px',
   entryCollection_jukugo: '18px',
   entryCollection_kunyomi: '18px'
 }
 
 export function applyColors(composite: Composite) {
+  if (composite.children().length === 0) return;
   composite.apply({
     '.usefulness': { textColor: colors.usefulness },
     '.tagContainer': { background: colors.tag },
@@ -42,11 +44,12 @@ export function applyColors(composite: Composite) {
     '.particle': { textColor: colors.particle, tintColor: colors.particle },
     '.componentKanji': { textColor: colors.component, tintColor: colors.component },
     '.usedIn': { textColor: colors.link, tintColor: colors.link },
-    '.lookalike': { textColor: colors.link, tintColor: colors.link }
+    '.lookalike': { textColor: colors.link, tintColor: colors.link },
   });
 }
 
 export function applyFonts(composite: Composite) {
+  if (composite.children().length === 0) return;
   composite.apply({
     '.usefulness': {font: fonts.usefulness},
     '.mainUsefulness': {font: fonts.mainUsefulness},
@@ -64,6 +67,7 @@ export function applyFonts(composite: Composite) {
     '.kanji': {font: fonts.kanji},
     '.component': {font: fonts.component},
     '.componentKanji': {font: fonts.component},
-    '.smallLabel': {font: fonts.smallLabel}
+    '.smallLabel': {font: fonts.smallLabel},
+    '.mainComponent': {font: fonts.mainComponent}
   })
 }

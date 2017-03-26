@@ -75,28 +75,3 @@ export function getType(object: IFact) {
 }
 
 
-// TODO: Revmoce in favor of Component Display class?
-  export function createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[], maxColumns?: number) {
-    let composite = new Composite({ class: 'components' });
-    let prevLeft: any = 0;
-    let prevTop: any = 0;
-    let columns = 0;
-    components.forEach(component => {
-      columns++;
-      prevLeft = new TextView({ class: 'componentKanji', text: component.kanji + ' ' })
-        .set({ top: prevTop, left: prevLeft })
-        .appendTo(composite);
-      let meaning = '(' + component.meaning + ')';
-      meaning += components.indexOf(component) == components.length - 1 ? '' : ' + '
-      prevLeft = new TextView({ class: 'componentMeaning', text: meaning })
-        .set({ top: prevTop, left: prevLeft })
-        .appendTo(composite);
-      if (columns >= maxColumns) {
-        columns = 0;
-        prevTop = prevLeft;
-        prevLeft = 0;
-      }
-    });
-    return composite;
-  }
-

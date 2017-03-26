@@ -27,7 +27,8 @@ export default class WordDisplay extends Composite {
   }
 
   public applyData(data: IWord): this {
-    // todo: add componentsDisplay
+    // TODO: add componentsDisplay
+    // TODO: add Tags
     // TODO: remove description TextView when description is empty or meaning === description
     if (data) {
       console.log(data);

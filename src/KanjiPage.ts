@@ -4,6 +4,7 @@ import { parseImage, getUsefulnessStars, createKanji, getOnyomi, createTag, crea
 import { applyColors, applyFonts } from './resources';
 import { dictionary } from "./app";
 import WordDisplay from "./WordDisplay";
+import ComponentsDisplay from "./ComponentsDisplay";
 
 const TEMP_KUN_KANJI_SETTING = true;
 
@@ -21,12 +22,13 @@ export default class KanjiPage extends Page {
   private strokeCount: TextView;
   private meaning: TextView;
   private number: TextView;
+  private componentsDisplay: ComponentsDisplay;
+  private mnemonic: TextView;
 
   private kunyomiDisplays: WordDisplay[];
   private kunSeparators: Widget[];
   private jukugoDisplays: WordDisplay[];
   private jukSeparators: Widget[];
-  private mnemonic: TextView;
   private kunLabel: TextView;
   private jukugoLabel: TextView;
 
@@ -52,6 +54,7 @@ export default class KanjiPage extends Page {
     this.number = new TextView().appendTo(this.scrollView);
     this.onLabel = new TextView({ class: 'label', text: 'On: ' }).appendTo(this.scrollView);
     this.onyomi = new TextView({ class: 'onyomi' }).appendTo(this.scrollView);
+    this.componentsDisplay = new ComponentsDisplay(3, 'mainComponent').appendTo(this.scrollView);
     this.mnemonic = new TextView({ class: 'mnemonic', markupEnabled: true }).appendTo(this.scrollView);
     this.kunLabel = new TextView({ class: 'label', id: 'kunLabel', text: 'Kunyomi: ' }).appendTo(this.scrollView);
     this.kunyomiDisplays = [];
@@ -83,21 +86,7 @@ export default class KanjiPage extends Page {
     this.mnemonic.text = data.mnemonic;
     this.handleWordDisplays(data.kunyomi, this.kunLabel, this.kunyomiDisplays, this.kunSeparators, MAX_KUNYOMI);
     this.handleWordDisplays(data.jukugo.map(index => dictionary.jukugo[index]), this.jukugoLabel, this.jukugoDisplays, this.jukSeparators, MAX_JUKUGO);
-    for (let i = 0; i < MAX_JUKUGO; i++) {
-      if (i < data.jukugo.length) {
-        if (!this.jukugoDisplays[i].parent()) {
-          this.jukugoDisplays[i].insertAfter(this.jukugoLabel);
-          this.jukSeparators[i].insertAfter(this.jukugoDisplays[i]);
-        }
-        this.jukugoDisplays[i].applyData(dictionary.jukugo[data.jukugo[i]]);
-      }
-      if (i >= data.jukugo.length) {
-        if (this.jukugoDisplays[i].parent()) {
-          this.jukugoDisplays[i].detach();
-          this.jukSeparators[i].detach();
-        }
-      }
-    }
+    this.componentsDisplay.applyData(data.components);
   }
 
   private handleWordDisplays(data: IWord[], baseWidget: Widget, wordDisplays: WordDisplay[], separators: Widget[], maxElements: number) {
@@ -144,6 +133,7 @@ export default class KanjiPage extends Page {
     this.meaning.layoutData = { left: [this.mainKanji, 10], top: 38, right: 100 };
     this.onLabel.layoutData = { left: [this.mainKanji, 10], top: this.meaning };
     this.onyomi.layoutData = { left: [this.onLabel, 0], baseline: this.onLabel, right: 50 };
+    this.componentsDisplay.layoutData = {left: 20, right: 20, top: [this.onyomi, 5]}
     //rest
     this.mnemonic.layoutData = { left: 10, top: ['prev()', 5], right: 10 };
     this.kunLabel.layoutData = { left: 10, top: ['prev()', 5] };

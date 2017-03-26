@@ -50,13 +50,13 @@ export function getOnyomi(data: { onyomi: string[] }) {
   return result.join(", ");
 }
 
-export function createTag(tag: string, size = 16) {
+export function createTag(tag?: string, size = 16) {
   const INNER_MARGIN = 3;
   return new Composite({ class: 'tag', cornerRadius: 3, background: colors.tag }).append(
     new TextView({
       left: INNER_MARGIN,
       right: INNER_MARGIN,
-      text: tag,
+      text: tag || '',
       textColor: 'white',
       font: 'bold ' + size + 'px'
     })
@@ -73,4 +73,30 @@ export function getType(object: IFact) {
   if (object.id.slice(0, 3) == 'kun') return "kunyomi";
   return "undefined";
 }
+
+
+// TODO: Revmoce in favor of Component Display class?
+  export function createComponentsDisplay(components: { kanji: string, kanjiImageSource?: string, meaning: string }[], maxColumns?: number) {
+    let composite = new Composite({ class: 'components' });
+    let prevLeft: any = 0;
+    let prevTop: any = 0;
+    let columns = 0;
+    components.forEach(component => {
+      columns++;
+      prevLeft = new TextView({ class: 'componentKanji', text: component.kanji + ' ' })
+        .set({ top: prevTop, left: prevLeft })
+        .appendTo(composite);
+      let meaning = '(' + component.meaning + ')';
+      meaning += components.indexOf(component) == components.length - 1 ? '' : ' + '
+      prevLeft = new TextView({ class: 'componentMeaning', text: meaning })
+        .set({ top: prevTop, left: prevLeft })
+        .appendTo(composite);
+      if (columns >= maxColumns) {
+        columns = 0;
+        prevTop = prevLeft;
+        prevLeft = 0;
+      }
+    });
+    return composite;
+  }
 

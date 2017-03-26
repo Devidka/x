@@ -27,6 +27,7 @@ export let fonts = {
   particle: '16px',
   furigana: '10px',
   kanji: '20px',
+  mainKanji: '80px',
   entryCollection_kanji: '30px',
   entryCollection_jukugo: '18px',
   entryCollection_kunyomi: '18px'
@@ -37,7 +38,7 @@ export function applyColors(composite: Composite) {
     '.usefulness': { textColor: colors.usefulness },
     '.tagContainer': { background: colors.tag },
     '.onyomi': { textColor: colors.onyomi },
-    '#meaning': { textColor: colors.translation },
+    '.mainMeaning': { textColor: colors.translation },
     '.particle': { textColor: colors.particle, tintColor: colors.particle },
     '.componentKanji': { textColor: colors.component, tintColor: colors.component },
     '.usedIn': { textColor: colors.link, tintColor: colors.link },
@@ -48,8 +49,9 @@ export function applyColors(composite: Composite) {
 export function applyFonts(composite: Composite) {
   composite.apply({
     '.usefulness': {font: fonts.usefulness},
-    '#usefulness': {font: fonts.mainUsefulness},
-    '#meaning': {font: fonts.meaning},
+    '.mainUsefulness': {font: fonts.mainUsefulness},
+    '.mainMeaning': {font: fonts.meaning},
+    '.mainKanji': {font: fonts.mainKanji},
     '.label': {font: fonts.label},
     '.onyomi': {font: fonts.onyomi},
     '.mnemonic': {font: fonts.bigText},

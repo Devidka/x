@@ -18,7 +18,7 @@ export let fonts = {
   mainMeaning: '30px',
   number: '16px',
   strokeCount: '16px',
-  component: '14px',
+  wordComponent: '14px',
   label: '26px',
   smallLabel: '18px',
   onyomi: '26px',

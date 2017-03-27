@@ -1,6 +1,7 @@
 import { Composite, TextView, CompositeProperties } from "tabris/tabris";
 import { createKanjiWithFurigana, getType, getUsefulnessStars, createTag } from "./util";
 import { IWord, IJukugo, IKunyomi } from "./interfaces";
+import ComponentsDisplay from "./ComponentsDisplay";
 
 const COLUMN_WIDTH = 110;
 
@@ -17,7 +18,7 @@ export default class WordDisplay extends Composite {
   private kanjiBox: Composite;
   private meaning: TextView;
   private description: TextView;
-
+  private components: ComponentsDisplay;
 
   constructor(properties?: CompositeProperties) {
     super(properties || {});
@@ -30,16 +31,16 @@ export default class WordDisplay extends Composite {
     this.kanjiBox = createKanjiWithFurigana('', '').appendTo(this.leftSide);
     this.preOkurigana = new TextView({ class: 'kana' }).appendTo(this.leftSide);
     this.preParticle = new TextView({ class: 'particle' }).appendTo(this.leftSide);
+    this.components = new ComponentsDisplay(2, 'wordComponent').appendTo(this.rightSide);
     this.meaning = new TextView({ class: 'meaning' }).appendTo(this.rightSide);
     this.description = new TextView({ class: 'description' }).appendTo(this.rightSide);
     this.applyLayout();
   }
 
   public applyData(data: IWord): this {
-    // TODO: add componentsDisplay
-    // TODO: add Tags
     // TODO: remove description TextView when description is empty or meaning === description
     if (data) {
+      if (getType(data) === 'jukugo') this.components.applyData((data as IJukugo).components);
       this.visible = true;
       this.addTags(data.tags)
       let preOkurigana = (getType(data) === 'jukugo') ? (data as IJukugo).okurigana.pre : '';
@@ -83,7 +84,8 @@ export default class WordDisplay extends Composite {
     this.kanjiBox.layoutData = { right: ['prev()', 0], top: 15 };
     this.preOkurigana.layoutData = { right: ['prev()', 0], top: [this.usefulness, 8] };
     this.preParticle.layoutData = { right: ['prev()', 2], top: [this.usefulness, 9] };
-    this.meaning.layoutData = { top: 20, left: 0, right: 0 };
+    this.components.layoutData = { top: 0, left: 0, right: 0 };
+    this.meaning.layoutData = { top: this.class === 'jukugoDisplay' ? this.components : 20 , left: 0, right: 0 };
     this.description.layoutData = { top: ['prev()', 5], left: 0, right: 0 };
   }
 }

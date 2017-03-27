@@ -60,7 +60,7 @@ export default class KanjiPage extends Page {
     this.kunyomiDisplays = [];
     this.kunSeparators = [];
     for (let i = 0; i < MAX_KUNYOMI; i++) {
-      this.kunyomiDisplays.push(new WordDisplay({ class: 'kunDisplay' }).appendTo(this.scrollView));
+      this.kunyomiDisplays.push(new WordDisplay({ class: 'kunyomiDisplay' }).appendTo(this.scrollView));
       this.kunSeparators.push(new Composite({ background: '#ddd' }).appendTo(this.scrollView));
     }
     this.jukugoLabel = new TextView({ class: 'label', id: 'jukugoLabel', text: 'Jukugo: ' }).appendTo(this.scrollView);;

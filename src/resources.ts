@@ -34,7 +34,9 @@ export let fonts = {
   mainComponent: '18px',
   entryCollection_kanji: '30px',
   entryCollection_jukugo: '18px',
-  entryCollection_kunyomi: '18px'
+  entryCollection_kunyomi: '18px',
+  mainTag: 'bold 16px',
+  wordTag: 'bold 12px',
 }
 
 export function applyColors(composite: Composite) {

@@ -112,7 +112,7 @@ export default class KanjiPage extends Page {
     for (let i = 0; i < Math.max(this.tags.length, tags.length); i++) {
       if (i < tags.length) {
         if (i >= this.tags.length) {
-          previousTag = createTag().set({ right: 10, top: [previousTag, 5] }).appendTo(this.scrollView);
+          previousTag = createTag('mainTag').set({ right: 10, top: [previousTag, 5] }).appendTo(this.scrollView);
           this.tags.push(previousTag);
         }
         this.tags[i].find('TextView').set('text', tags[i]);

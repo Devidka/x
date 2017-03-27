@@ -1,7 +1,7 @@
 import { TextView, ImageView, Composite } from 'tabris';
 import { toHiragana, toKatakana } from './wanakana';
 import { config, dictionary } from './app';
-import { colors } from './resources';
+import { colors, fonts } from './resources';
 import { IKanji, IFact } from "./interfaces";
 
 export function parseImage(tag) {
@@ -50,15 +50,15 @@ export function getOnyomi(data: { onyomi: string[] }) {
   return result.join(", ");
 }
 
-export function createTag(tag?: string, size = 16) {
+export function createTag(textClass: string) {
   const INNER_MARGIN = 3;
-  return new Composite({ class: 'tag', cornerRadius: 3, background: colors.tag }).append(
+  return new Composite({ class: 'tag', cornerRadius: 3, background: colors.tagContainer }).append(
     new TextView({
+      class: textClass,
+      font: fonts[textClass],
       left: INNER_MARGIN,
       right: INNER_MARGIN,
-      text: tag || '',
-      textColor: 'white',
-      font: 'bold ' + size + 'px'
+      textColor: 'white',      
     })
   );
 }

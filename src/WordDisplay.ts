@@ -2,6 +2,7 @@ import { Composite, TextView, CompositeProperties } from "tabris/tabris";
 import { createKanjiWithFurigana, getType, getUsefulnessStars, createTag } from "./util";
 import { IWord, IJukugo, IKunyomi } from "./interfaces";
 import ComponentsDisplay from "./ComponentsDisplay";
+import { applyFonts, applyColors } from "./resources";
 
 const COLUMN_WIDTH = 110;
 
@@ -35,6 +36,8 @@ export default class WordDisplay extends Composite {
     this.meaning = new TextView({ class: 'meaning' }).appendTo(this.rightSide);
     this.description = new TextView({ class: 'description' }).appendTo(this.rightSide);
     this.applyLayout();
+    applyColors(this);
+    applyFonts(this);
   }
 
   public applyData(data: IWord): this {

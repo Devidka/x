@@ -57,12 +57,14 @@ export default class FactListPage extends Page {
   }
 
   private handleSelectCell(event) {
+    let then = Date.now();
     let entryNum = event.index;
-    new KanjiPage(this.facts.get(entryNum) as IKanji, (entryNum + 1) + '/' + this.facts.length).on('navigate', event => {
+    new KanjiPage().applyData(this.facts.get(entryNum) as IKanji).on('navigate', event => {
       entryNum = (entryNum + event.offset) % this.facts.length;
       entryNum = (entryNum < 0) ? this.facts.length + entryNum : entryNum;
       event.target.applyData(this.facts.get(entryNum));
     }).appendTo(navigationView);
+    console.log(Date.now() - then);
   };
 }
 
